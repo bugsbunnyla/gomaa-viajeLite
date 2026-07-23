@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gomaa-ViajeLite | AI Agentic Travel Team</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --primary:#0f766e; --primary-light:#14b8a6; --primary-dark:#0d5c56;
+  --accent:#f59e0b; --accent-light:#fbbf24; --accent-dark:#d97706;
+  --bg:#f8fafc; --card:#ffffff; --text:#1e293b; --text-light:#64748b;
+  --border:#e2e8f0; --success:#10b981; --warning:#f59e0b; --danger:#ef4444;
+  --info:#3b82f6; --purple:#8b5cf6; --pink:#ec4899;
+  --star-gold:#fbbf24;
+  --gradient-hero:linear-gradient(135deg,#0f766e 0%,#134e4a 50%,#0d5c56 100%);
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.05); --shadow:0 4px 6px -1px rgba(0,0,0,0.1);
+  --shadow-lg:0 10px 15px -3px rgba(0,0,0,0.1); --shadow-xl:0 20px 40px -5px rgba(0,0,0,0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; overflow-x:hidden; }
+
+@keyframes float { 0%,100%{transform:translate(0,0)scale(1)} 33%{transform:translate(30px,-30px)scale(1.05)} 66%{transform:translate(-20px,20px)scale(0.95)} }
+@keyframes fadeInUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+@keyframes spin { to{transform:rotate(360deg)} }
+@keyframes agentPulse { 0%,100%{box-shadow:0 0 0 0 rgba(15,118,110,0.4)} 50%{box-shadow:0 0 0 8px rgba(15,118,110,0)} }
+
+.hero { background:var(--gradient-hero); min-height:100vh; display:flex; flex-direction:column; position:relative; overflow:hidden; }
+.hero::before { content:''; position:absolute; top:-50%; right:-20%; width:800px; height:800px; background:rgba(255,255,255,0.03); border-radius:50%; animation:float 20s ease-in-out infinite; }
+.hero::after { content:''; position:absolute; bottom:-30%; left:-10%; width:600px; height:600px; background:rgba(255,255,255,0.02); border-radius:50%; animation:float 25s ease-in-out infinite reverse; }
+
+.nav { display:flex; justify-content:space-between; align-items:center; padding:1.5rem 3rem; position:relative; z-index:10; }
+.logo { display:flex; align-items:center; gap:0.75rem; color:white; text-decoration:none; }
+.logo-icon { width:48px; height:48px; background:rgba(255,255,255,0.12); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.15); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; }
+.logo-text { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; }
+.logo-sub { font-size:0.65rem; opacity:0.7; letter-spacing:2.5px; text-transform:uppercase; }
+.nav-links { display:flex; gap:2.5rem; list-style:none; }
+.nav-links a { color:rgba(255,255,255,0.8); text-decoration:none; font-size:0.9rem; font-weight:500; transition:all 0.3s; position:relative; }
+.nav-links a::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px; background:var(--accent-light); transition:width 0.3s; }
+.nav-links a:hover { color:white; } .nav-links a:hover::after { width:100%; }
+
+.hero-content { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:2rem; position:relative; z-index:5; }
+.hero-badge { display:inline-flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.08); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.12); padding:0.5rem 1.25rem; border-radius:50px; color:var(--accent-light); font-size:0.85rem; font-weight:500; margin-bottom:1.5rem; }
+.hero h1 { font-family:'Playfair Display',serif; font-size:clamp(2.5rem,5vw,4.5rem); color:white; line-height:1.1; margin-bottom:1rem; }
+.hero h1 span { color:var(--accent-light); }
+.hero-subtitle { color:rgba(255,255,255,0.8); font-size:1.15rem; max-width:650px; margin-bottom:2.5rem; }
+
+.agent-strip { display:flex; gap:1rem; margin-bottom:2rem; flex-wrap:wrap; justify-content:center; }
+.agent-chip { display:flex; align-items:center; gap:0.5rem; padding:0.5rem 1rem; background:rgba(255,255,255,0.08); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); border-radius:50px; color:rgba(255,255,255,0.8); font-size:0.8rem; font-weight:500; transition:all 0.3s; cursor:pointer; }
+.agent-chip:hover { background:rgba(255,255,255,0.15); border-color:var(--accent-light); transform:translateY(-2px); }
+.agent-chip i { font-size:0.75rem; color:var(--accent-light); }
+.agent-chip.active { background:var(--accent); color:white; border-color:var(--accent); animation:agentPulse 2s infinite; }
+.agent-chip.active i { color:white; }
+
+.search-engine { background:rgba(255,255,255,0.06); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:2rem; width:100%; max-width:1100px; margin:0 auto; }
+.search-tabs { display:flex; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap; justify-content:center; }
+.search-tab { padding:0.6rem 1.25rem; border-radius:50px; border:none; background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.6); font-size:0.9rem; font-weight:500; cursor:pointer; transition:all 0.3s; display:flex; align-items:center; gap:0.5rem; }
+.search-tab.active { background:var(--accent); color:white; box-shadow:0 4px 15px rgba(245,158,11,0.3); }
+.search-tab:hover:not(.active) { background:rgba(255,255,255,0.12); color:white; }
+.search-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-bottom:1rem; }
+.search-field { position:relative; }
+.search-field label { display:block; color:rgba(255,255,255,0.5); font-size:0.7rem; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:0.4rem; font-weight:600; }
+.search-field input, .search-field select { width:100%; padding:0.9rem 1rem 0.9rem 2.5rem; border:1px solid rgba(255,255,255,0.12); border-radius:12px; background:rgba(255,255,255,0.05); color:white; font-size:0.95rem; font-family:'Inter',sans-serif; transition:all 0.3s; }
+.search-field input:focus, .search-field select:focus { outline:none; border-color:var(--accent-light); background:rgba(255,255,255,0.1); }
+.search-field input::placeholder { color:rgba(255,255,255,0.3); }
+.search-field i { position:absolute; left:1rem; bottom:1rem; color:rgba(255,255,255,0.35); font-size:0.9rem; }
+.search-field select { appearance:none; cursor:pointer; }
+.search-field select option { background:#1e293b; color:white; }
+.search-actions { display:flex; gap:1rem; align-items:center; flex-wrap:wrap; justify-content:center; }
+.btn-primary { padding:1rem 2.5rem; background:var(--accent); color:white; border:none; border-radius:12px; font-size:1rem; font-weight:600; cursor:pointer; transition:all 0.3s; display:flex; align-items:center; gap:0.5rem; box-shadow:0 4px 15px rgba(245,158,11,0.3); }
+.btn-primary:hover { background:var(--accent-light); transform:translateY(-2px); box-shadow:0 8px 25px rgba(245,158,11,0.4); }
+.btn-secondary { padding:1rem 1.5rem; background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:12px; font-size:0.9rem; font-weight:500; cursor:pointer; transition:all 0.3s; }
+.btn-secondary:hover { background:rgba(255,255,255,0.12); color:white; border-color:rgba(255,255,255,0.2); }
+.rewards-toggle { display:flex; align-items:center; gap:0.75rem; margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.08); }
+.toggle-switch { position:relative; width:48px; height:26px; }
+.toggle-switch input { opacity:0; width:0; height:0; }
+.toggle-slider { position:absolute; cursor:pointer; top:0;left:0;right:0;bottom:0; background:rgba(255,255,255,0.15); border-radius:26px; transition:0.3s; }
+.toggle-slider::before { content:''; position:absolute; height:20px; width:20px; left:3px; bottom:3px; background:white; border-radius:50%; transition:0.3s; }
+.toggle-switch input:checked + .toggle-slider { background:var(--accent); }
+.toggle-switch input:checked + .toggle-slider::before { transform:translateX(22px); }
+.rewards-toggle span { color:rgba(255,255,255,0.6); font-size:0.85rem; }
+.rewards-toggle span strong { color:var(--accent-light); }
+
+.chat-panel { position:fixed; bottom:2rem; right:2rem; width:420px; max-height:650px; background:var(--card); border-radius:20px; box-shadow:var(--shadow-xl); z-index:100; display:none; flex-direction:column; overflow:hidden; border:1px solid var(--border); animation:fadeInUp 0.4s ease; }
+.chat-panel.active { display:flex; }
+.chat-header { background:var(--gradient-hero); padding:1.25rem 1.5rem; color:white; display:flex; align-items:center; justify-content:space-between; }
+.chat-header-left { display:flex; align-items:center; gap:0.75rem; }
+.chat-avatar { width:40px; height:40px; background:rgba(255,255,255,0.15); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.1rem; border:2px solid var(--accent-light); }
+.chat-header-info h4 { font-size:0.95rem; font-weight:600; }
+.chat-header-info p { font-size:0.75rem; opacity:0.7; }
+.chat-close { background:none; border:none; color:white; font-size:1.2rem; cursor:pointer; opacity:0.7; transition:opacity 0.3s; }
+.chat-close:hover { opacity:1; }
+.chat-body { flex:1; overflow-y:auto; padding:1.25rem; display:flex; flex-direction:column; gap:1rem; background:#f8fafc; }
+.chat-message { display:flex; gap:0.75rem; max-width:90%; }
+.chat-message.user { align-self:flex-end; flex-direction:row-reverse; }
+.chat-message.agent { align-self:flex-start; }
+.chat-bubble { padding:0.875rem 1.125rem; border-radius:16px; font-size:0.9rem; line-height:1.5; max-width:100%; }
+.chat-message.agent .chat-bubble { background:white; color:var(--text); border:1px solid var(--border); border-bottom-left-radius:4px; box-shadow:var(--shadow-sm); }
+.chat-message.user .chat-bubble { background:var(--primary); color:white; border-bottom-right-radius:4px; }
+.quick-replies { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.5rem; }
+.quick-reply { padding:0.4rem 0.8rem; background:var(--bg); border:1px solid var(--border); border-radius:50px; font-size:0.8rem; color:var(--primary); cursor:pointer; transition:all 0.2s; font-weight:500; }
+.quick-reply:hover { background:var(--primary); color:white; border-color:var(--primary); }
+.chat-input-area { padding:1rem 1.25rem; border-top:1px solid var(--border); display:flex; gap:0.5rem; background:white; }
+.chat-input { flex:1; padding:0.75rem 1rem; border:1px solid var(--border); border-radius:12px; font-size:0.9rem; font-family:'Inter',sans-serif; outline:none; transition:border-color 0.3s; }
+.chat-input:focus { border-color:var(--primary-light); }
+.chat-send { width:40px; height:40px; background:var(--primary); color:white; border:none; border-radius:10px; cursor:pointer; transition:all 0.3s; display:flex; align-items:center; justify-content:center; }
+.chat-send:hover { background:var(--primary-dark); transform:scale(1.05); }
+.chat-fab { position:fixed; bottom:2rem; right:2rem; width:60px; height:60px; background:var(--gradient-hero); color:white; border:none; border-radius:50%; font-size:1.5rem; cursor:pointer; box-shadow:var(--shadow-xl); z-index:99; transition:all 0.3s; display:flex; align-items:center; justify-content:center; }
+.chat-fab:hover { transform:scale(1.1) rotate(10deg); }
+
+.results-section { padding:3rem; max-width:1400px; margin:0 auto; display:none; }
+.results-section.active { display:block; animation:fadeInUp 0.6s ease; }
+.results-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }
+.results-title { font-family:'Playfair Display',serif; font-size:1.75rem; color:var(--text); }
+.results-count { color:var(--text-light); font-size:0.9rem; }
+.sort-controls { display:flex; gap:0.5rem; flex-wrap:wrap; }
+.sort-btn { padding:0.5rem 1rem; border:1px solid var(--border); background:white; border-radius:8px; font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.3s; color:var(--text-light); }
+.sort-btn.active { background:var(--primary); color:white; border-color:var(--primary); }
+.sort-btn:hover:not(.active) { border-color:var(--primary-light); color:var(--primary); }
+
+.results-layout { display:grid; grid-template-columns:280px 1fr; gap:2rem; }
+@media(max-width:900px){ .results-layout{grid-template-columns:1fr;} }
+
+.filters-panel { background:var(--card); border-radius:16px; padding:1.5rem; box-shadow:var(--shadow); height:fit-content; position:sticky; top:1rem; }
+.filter-group { margin-bottom:1.5rem; padding-bottom:1.5rem; border-bottom:1px solid var(--border); }
+.filter-group:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+.filter-label { font-weight:600; font-size:0.9rem; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem; }
+.filter-label i { color:var(--primary-light); font-size:0.85rem; }
+.filter-options { display:flex; flex-direction:column; gap:0.5rem; }
+.filter-option { display:flex; align-items:center; gap:0.6rem; padding:0.4rem 0; cursor:pointer; font-size:0.85rem; color:var(--text-light); transition:color 0.2s; }
+.filter-option:hover { color:var(--text); }
+.filter-option input[type="checkbox"] { width:18px; height:18px; accent-color:var(--primary); cursor:pointer; }
+
+.results-list { display:flex; flex-direction:column; gap:1rem; }
+.result-card { background:var(--card); border-radius:16px; box-shadow:var(--shadow); overflow:hidden; transition:all 0.3s; border:1px solid var(--border); }
+.result-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-2px); }
+.result-card.featured { border:2px solid var(--accent); position:relative; }
+.result-card.featured::before { content:'BEST VALUE'; position:absolute; top:0; right:0; background:var(--accent); color:white; font-size:0.7rem; font-weight:700; padding:0.3rem 0.8rem; border-bottom-left-radius:12px; letter-spacing:1px; }
+.result-card.points-sweet { border:2px solid var(--primary-light); }
+.result-card.points-sweet::before { content:'POINTS SWEET SPOT'; position:absolute; top:0; right:0; background:var(--primary-light); color:white; font-size:0.65rem; font-weight:700; padding:0.3rem 0.8rem; border-bottom-left-radius:12px; letter-spacing:1px; }
+
+.result-main { display:grid; grid-template-columns:auto 1fr auto; gap:1.5rem; padding:1.5rem; align-items:center; }
+@media(max-width:768px){ .result-main{grid-template-columns:1fr;text-align:center;} }
+
+.airline-logo { width:64px; height:64px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:white; font-weight:700; flex-shrink:0; }
+.airline-logo.united { background:#002244; } .airline-logo.lufthansa { background:#05164d; }
+.airline-logo.ana { background:#13448f; } .airline-logo.singapore { background:#fbae17; color:#1e1e1e; }
+.airline-logo.turkish { background:#c8102e; } .airline-logo.aeroplan { background:#e31937; }
+.airline-logo.avianca { background:#d52b1e; } .airline-logo.tap { background:#004a98; }
+
+.flight-info h3 { font-size:1.1rem; font-weight:600; margin-bottom:0.3rem; }
+.flight-route { display:flex; align-items:center; gap:0.75rem; color:var(--text-light); font-size:0.9rem; margin-bottom:0.5rem; flex-wrap:wrap; }
+.flight-route .arrow { color:var(--primary-light); }
+.flight-meta { display:flex; gap:1rem; flex-wrap:wrap; font-size:0.8rem; }
+.flight-meta span { display:flex; align-items:center; gap:0.3rem; color:var(--text-light); }
+.flight-meta i { font-size:0.75rem; color:var(--primary-light); }
+.stops-badge { display:inline-flex; align-items:center; gap:0.3rem; padding:0.2rem 0.6rem; border-radius:50px; font-size:0.75rem; font-weight:600; }
+.stops-badge.direct { background:#d1fae5; color:#065f46; } .stops-badge.stop { background:#fef3c7; color:#92400e; }
+
+.price-block { text-align:right; min-width:180px; }
+@media(max-width:768px){ .price-block{text-align:center;} }
+.price-original { text-decoration:line-through; color:var(--text-light); font-size:0.85rem; }
+.price-current { font-size:1.75rem; font-weight:700; color:var(--text); line-height:1; }
+.price-current .currency { font-size:1rem; font-weight:500; color:var(--text-light); }
+.price-points { display:flex; align-items:center; justify-content:flex-end; gap:0.3rem; margin-top:0.3rem; font-size:0.8rem; color:var(--primary); font-weight:600; }
+.price-points i { color:var(--accent); }
+.savings-tag { display:inline-flex; align-items:center; gap:0.3rem; background:#d1fae5; color:#065f46; padding:0.2rem 0.6rem; border-radius:50px; font-size:0.75rem; font-weight:600; margin-top:0.4rem; }
+.rating-block { display:flex; align-items:center; gap:0.5rem; margin-top:0.5rem; justify-content:flex-end; }
+@media(max-width:768px){ .rating-block{justify-content:center;} .price-points{justify-content:center;} }
+.stars { display:flex; gap:0.1rem; } .stars i { color:var(--star-gold); font-size:0.8rem; }
+.rating-text { font-size:0.8rem; color:var(--text-light); font-weight:500; }
+
+.result-details { background:#f8fafc; padding:1rem 1.5rem; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; border-top:1px solid var(--border); }
+.detail-item { display:flex; align-items:center; gap:0.75rem; }
+.detail-item i { width:32px; height:32px; background:white; border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:0.85rem; box-shadow:var(--shadow-sm); }
+.detail-item .detail-label { font-size:0.75rem; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px; }
+.detail-item .detail-value { font-size:0.9rem; font-weight:600; color:var(--text); }
+
+.result-actions { display:flex; gap:0.75rem; padding:1rem 1.5rem; border-top:1px solid var(--border); flex-wrap:wrap; }
+.btn-book { padding:0.6rem 1.25rem; background:var(--primary); color:white; border:none; border-radius:8px; font-size:0.85rem; font-weight:600; cursor:pointer; transition:all 0.3s; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; }
+.btn-book:hover { background:var(--primary-dark); transform:translateY(-1px); }
+.btn-outline { padding:0.6rem 1.25rem; background:transparent; color:var(--primary); border:1px solid var(--primary); border-radius:8px; font-size:0.85rem; font-weight:600; cursor:pointer; transition:all 0.3s; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; }
+.btn-outline:hover { background:var(--primary); color:white; }
+.btn-rewards { padding:0.6rem 1.25rem; background:var(--accent); color:white; border:none; border-radius:8px; font-size:0.85rem; font-weight:600; cursor:pointer; transition:all 0.3s; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; }
+.btn-rewards:hover { background:var(--accent-dark); transform:translateY(-1px); }
+
+.modal-overlay { position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:200; display:none; align-items:center; justify-content:center; padding:2rem; }
+.modal-overlay.active { display:flex; animation:fadeIn 0.3s ease; }
+.modal { background:var(--card); border-radius:24px; width:100%; max-width:700px; max-height:90vh; overflow:hidden; box-shadow:var(--shadow-xl); animation:fadeInUp 0.4s ease; }
+.modal-header { background:var(--gradient-hero); padding:1.5rem 2rem; color:white; display:flex; justify-content:space-between; align-items:center; }
+.modal-header h3 { font-family:'Playfair Display',serif; font-size:1.3rem; }
+.modal-close { background:none; border:none; color:white; font-size:1.5rem; cursor:pointer; opacity:0.7; transition:opacity 0.3s; }
+.modal-close:hover { opacity:1; }
+.modal-body { padding:2rem; overflow-y:auto; max-height:calc(90vh - 80px); }
+
+.booking-step { display:none; }
+.booking-step.active { display:block; animation:fadeInUp 0.4s ease; }
+.step-indicator { display:flex; justify-content:space-between; margin-bottom:2rem; position:relative; }
+.step-indicator::before { content:''; position:absolute; top:15px; left:0; right:0; height:3px; background:var(--border); z-index:0; }
+.step-dot { width:32px; height:32px; background:var(--border); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; color:var(--text-light); position:relative; z-index:1; transition:all 0.3s; }
+.step-dot.active { background:var(--primary); color:white; }
+.step-dot.completed { background:var(--success); color:white; }
+.step-label { position:absolute; top:40px; left:50%; transform:translateX(-50%); font-size:0.7rem; color:var(--text-light); white-space:nowrap; font-weight:500; }
+
+.form-group { margin-bottom:1.25rem; }
+.form-group label { display:block; font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:0.4rem; }
+.form-group input, .form-group select, .form-group textarea { width:100%; padding:0.875rem 1rem; border:1px solid var(--border); border-radius:10px; font-size:0.95rem; font-family:'Inter',sans-serif; transition:all 0.3s; background:white; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline:none; border-color:var(--primary-light); box-shadow:0 0 0 3px rgba(20,184,166,0.1); }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+@media(max-width:600px){ .form-row{grid-template-columns:1fr;} }
+
+.booking-summary { background:#f0fdfa; border-radius:12px; padding:1.25rem; margin-bottom:1.5rem; }
+.booking-summary h4 { font-size:0.9rem; color:var(--primary); margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem; }
+.summary-line { display:flex; justify-content:space-between; padding:0.4rem 0; font-size:0.9rem; }
+.summary-line.total { border-top:2px solid var(--primary-light); padding-top:0.75rem; margin-top:0.5rem; font-weight:700; font-size:1.1rem; color:var(--text); }
+
+.payment-methods { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; margin-bottom:1.5rem; }
+.payment-method { padding:1rem; border:2px solid var(--border); border-radius:12px; text-align:center; cursor:pointer; transition:all 0.3s; background:white; }
+.payment-method:hover { border-color:var(--primary-light); }
+.payment-method.selected { border-color:var(--primary); background:#f0fdfa; }
+.payment-method i { font-size:1.5rem; color:var(--primary); margin-bottom:0.5rem; }
+.payment-method span { display:block; font-size:0.8rem; font-weight:600; color:var(--text); }
+
+.card-element { padding:1rem; border:1px solid var(--border); border-radius:10px; background:#f8fafc; margin-bottom:1rem; }
+.card-row { display:grid; grid-template-columns:2fr 1fr 1fr; gap:1rem; margin-bottom:0.75rem; }
+@media(max-width:600px){ .card-row{grid-template-columns:1fr;} }
+
+.payment-success { text-align:center; padding:2rem; }
+.payment-success .success-icon { width:80px; height:80px; background:var(--success); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem; font-size:2rem; color:white; animation:pulse 0.5s ease; }
+.payment-success h3 { font-family:'Playfair Display',serif; font-size:1.5rem; margin-bottom:0.5rem; }
+.payment-success p { color:var(--text-light); margin-bottom:1.5rem; }
+.ticket-preview { background:linear-gradient(135deg,#f0fdfa 0%,#e0f2fe 100%); border-radius:16px; padding:1.5rem; margin-bottom:1.5rem; text-align:left; border:2px dashed var(--primary-light); }
+.ticket-preview h4 { font-size:0.9rem; color:var(--primary); margin-bottom:1rem; }
+.ticket-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid rgba(0,0,0,0.05); font-size:0.9rem; }
+.ticket-row:last-child { border-bottom:none; }
+
+.rewards-panel { background:linear-gradient(135deg,#0f766e 0%,#134e4a 100%); border-radius:16px; padding:2rem; color:white; margin-bottom:2rem; display:none; }
+.rewards-panel.active { display:block; animation:fadeInUp 0.5s ease; }
+.rewards-panel h3 { font-family:'Playfair Display',serif; font-size:1.3rem; margin-bottom:0.5rem; }
+.rewards-panel p { opacity:0.8; font-size:0.9rem; margin-bottom:1.5rem; }
+.rewards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; }
+.reward-card { background:rgba(255,255,255,0.08); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:1.25rem; transition:all 0.3s; }
+.reward-card:hover { background:rgba(255,255,255,0.12); transform:translateY(-2px); }
+.reward-card h4 { font-size:0.95rem; margin-bottom:0.3rem; display:flex; align-items:center; gap:0.5rem; }
+.reward-card h4 i { color:var(--accent-light); }
+.reward-card .reward-value { font-size:1.5rem; font-weight:700; color:var(--accent-light); margin:0.5rem 0; }
+.reward-card .reward-desc { font-size:0.8rem; opacity:0.7; line-height:1.5; }
+.reward-card .reward-link { display:inline-flex; align-items:center; gap:0.3rem; margin-top:0.75rem; color:var(--accent-light); font-size:0.8rem; font-weight:600; text-decoration:none; transition:gap 0.3s; }
+.reward-card .reward-link:hover { gap:0.6rem; }
+
+.bundle-section { padding:3rem; max-width:1400px; margin:0 auto; display:none; }
+.bundle-section.active { display:block; animation:fadeInUp 0.6s ease; }
+.bundle-builder { background:var(--card); border-radius:20px; box-shadow:var(--shadow-lg); overflow:hidden; }
+.bundle-header { background:var(--gradient-hero); padding:2rem; color:white; }
+.bundle-header h2 { font-family:'Playfair Display',serif; font-size:1.75rem; margin-bottom:0.5rem; }
+.bundle-header p { opacity:0.85; }
+.bundle-tabs { display:flex; border-bottom:1px solid var(--border); background:#f8fafc; }
+.bundle-tab { flex:1; padding:1rem; text-align:center; border:none; background:transparent; font-size:0.9rem; font-weight:600; color:var(--text-light); cursor:pointer; transition:all 0.3s; border-bottom:3px solid transparent; display:flex; align-items:center; justify-content:center; gap:0.5rem; }
+.bundle-tab.active { color:var(--primary); border-bottom-color:var(--primary); background:white; }
+.bundle-content { padding:2rem; }
+.bundle-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; }
+.bundle-card { border:2px solid var(--border); border-radius:16px; padding:1.5rem; transition:all 0.3s; cursor:pointer; position:relative; }
+.bundle-card:hover { border-color:var(--primary-light); box-shadow:var(--shadow-lg); }
+.bundle-card.selected { border-color:var(--primary); background:#f0fdfa; }
+.bundle-card.selected::after { content:'\f00c'; font-family:'Font Awesome 6 Free'; font-weight:900; position:absolute; top:1rem; right:1rem; width:28px; height:28px; background:var(--primary); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; }
+.bundle-card h4 { font-size:1.1rem; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem; }
+.bundle-card h4 i { color:var(--primary); }
+.bundle-card .bundle-price { font-size:1.5rem; font-weight:700; color:var(--text); margin:0.5rem 0; }
+.bundle-card .bundle-price .points-alt { font-size:0.85rem; color:var(--primary); font-weight:500; }
+.bundle-card .bundle-features { list-style:none; font-size:0.85rem; color:var(--text-light); }
+.bundle-card .bundle-features li { padding:0.3rem 0; display:flex; align-items:center; gap:0.5rem; }
+.bundle-card .bundle-features li i { color:var(--success); font-size:0.75rem; }
+.bundle-summary { background:#f8fafc; padding:1.5rem; border-radius:12px; margin-top:2rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+.bundle-total { font-size:1.25rem; }
+.bundle-total strong { font-size:1.75rem; color:var(--primary); }
+
+.points-section { padding:3rem; max-width:1400px; margin:0 auto; display:none; }
+.points-section.active { display:block; animation:fadeInUp 0.6s ease; }
+.points-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(350px,1fr)); gap:1.5rem; }
+.points-card { background:var(--card); border-radius:16px; box-shadow:var(--shadow); overflow:hidden; transition:all 0.3s; }
+.points-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-2px); }
+.points-card-header { padding:1.25rem 1.5rem; display:flex; align-items:center; gap:1rem; border-bottom:1px solid var(--border); }
+.points-card-header .program-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.25rem; color:white; font-weight:700; }
+.points-card-header h4 { font-size:1rem; }
+.points-card-header .program-tag { font-size:0.75rem; color:var(--text-light); }
+.points-card-body { padding:1.25rem 1.5rem; }
+.sweet-spot { background:#f0fdfa; border-left:3px solid var(--primary); padding:0.75rem 1rem; border-radius:0 8px 8px 0; margin-bottom:0.75rem; }
+.sweet-spot-label { font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:var(--primary); font-weight:600; margin-bottom:0.2rem; }
+.sweet-spot-value { font-size:0.9rem; font-weight:600; color:var(--text); }
+.transfer-partners { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.75rem; }
+.transfer-tag { padding:0.25rem 0.6rem; background:#f1f5f9; border-radius:50px; font-size:0.75rem; color:var(--text-light); }
+.transfer-tag.highlight { background:#fef3c7; color:#92400e; }
+.points-action { padding:1rem 1.5rem; border-top:1px solid var(--border); display:flex; gap:0.5rem; flex-wrap:wrap; }
+
+.getaways-section { padding:3rem; max-width:1400px; margin:0 auto; display:none; }
+.getaways-section.active { display:block; animation:fadeInUp 0.6s ease; }
+.getaways-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:1.5rem; }
+.getaway-card { background:var(--card); border-radius:20px; overflow:hidden; box-shadow:var(--shadow); transition:all 0.3s; }
+.getaway-card:hover { box-shadow:var(--shadow-xl); transform:translateY(-4px); }
+.getaway-image { height:200px; position:relative; display:flex; align-items:center; justify-content:center; font-size:3rem; }
+.getaway-image.budget { background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%); }
+.getaway-image.luxury { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); }
+.getaway-image.family { background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%); }
+.getaway-image.adventure { background:linear-gradient(135deg,#fa709a 0%,#fee140 100%); }
+.getaway-image.romantic { background:linear-gradient(135deg,#a8edea 0%,#fed6e3 100%); }
+.getaway-image.solo { background:linear-gradient(135deg,#ffecd2 0%,#fcb69f 100%); }
+.getaway-badge { position:absolute; top:1rem; left:1rem; padding:0.4rem 0.8rem; background:rgba(0,0,0,0.5); backdrop-filter:blur(10px); color:white; border-radius:50px; font-size:0.75rem; font-weight:600; }
+.getaway-content { padding:1.5rem; }
+.getaway-content h3 { font-size:1.15rem; margin-bottom:0.3rem; }
+.getaway-content .destination { color:var(--text-light); font-size:0.9rem; margin-bottom:0.75rem; }
+.getaway-price-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+.getaway-price { font-size:1.25rem; font-weight:700; color:var(--primary); }
+.getaway-price .per { font-size:0.8rem; color:var(--text-light); font-weight:400; }
+.getaway-rating { display:flex; align-items:center; gap:0.3rem; }
+.getaway-rating i { color:var(--star-gold); font-size:0.8rem; }
+.getaway-rating span { font-size:0.85rem; color:var(--text-light); }
+.getaway-includes { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:1rem; }
+.include-tag { padding:0.25rem 0.6rem; background:#f0fdfa; color:var(--primary); border-radius:50px; font-size:0.75rem; font-weight:500; }
+.getaway-cta { display:flex; gap:0.5rem; }
+
+.agent-dashboard { padding:3rem; max-width:1400px; margin:0 auto; display:none; }
+.agent-dashboard.active { display:block; animation:fadeInUp 0.6s ease; }
+.agent-workflow { background:var(--card); border-radius:20px; box-shadow:var(--shadow-lg); overflow:hidden; }
+.workflow-header { background:var(--gradient-hero); padding:2rem; color:white; }
+.workflow-header h2 { font-family:'Playfair Display',serif; font-size:1.75rem; margin-bottom:0.5rem; }
+.workflow-header p { opacity:0.85; }
+.workflow-body { padding:2rem; }
+.workflow-timeline { display:flex; flex-direction:column; gap:0; }
+.workflow-step { display:flex; gap:1.5rem; padding:1.5rem; border-left:3px solid var(--border); margin-left:20px; position:relative; transition:all 0.3s; }
+.workflow-step::before { content:''; position:absolute; left:-11px; top:1.5rem; width:20px; height:20px; background:var(--border); border-radius:50%; border:3px solid var(--card); }
+.workflow-step.active { border-left-color:var(--accent); }
+.workflow-step.active::before { background:var(--accent); animation:agentPulse 2s infinite; }
+.workflow-step.completed { border-left-color:var(--success); }
+.workflow-step.completed::before { background:var(--success); }
+.workflow-step-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:white; flex-shrink:0; }
+.workflow-step-content h4 { font-size:1rem; margin-bottom:0.25rem; }
+.workflow-step-content p { font-size:0.85rem; color:var(--text-light); }
+.workflow-step-status { margin-left:auto; padding:0.3rem 0.8rem; border-radius:50px; font-size:0.75rem; font-weight:600; }
+.workflow-step-status.pending { background:#f1f5f9; color:var(--text-light); }
+.workflow-step-status.active { background:#fef3c7; color:#92400e; }
+.workflow-step-status.completed { background:#d1fae5; color:#065f46; }
+
+.footer { background:var(--text); color:rgba(255,255,255,0.7); padding:3rem; margin-top:3rem; }
+.footer-grid { max-width:1400px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:2rem; }
+.footer-col h4 { color:white; font-size:1rem; margin-bottom:1rem; }
+.footer-col a { display:block; color:rgba(255,255,255,0.6); text-decoration:none; padding:0.3rem 0; font-size:0.85rem; transition:color 0.3s; }
+.footer-col a:hover { color:var(--accent-light); }
+.footer-bottom { max-width:1400px; margin:2rem auto 0; padding-top:2rem; border-top:1px solid rgba(255,255,255,0.1); text-align:center; font-size:0.8rem; color:rgba(255,255,255,0.4); }
+
+.loading-overlay { position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(15,118,110,0.95); display:none; align-items:center; justify-content:center; flex-direction:column; z-index:1000; color:white; }
+.loading-overlay.active { display:flex; }
+.spinner { width:60px; height:60px; border:3px solid rgba(255,255,255,0.2); border-top-color:var(--accent-light); border-radius:50%; animation:spin 1s linear infinite; margin-bottom:1.5rem; }
+.loading-text { font-size:1.1rem; font-weight:500; }
+.loading-sub { font-size:0.85rem; opacity:0.7; margin-top:0.5rem; }
+
+@media(max-width:768px){
+  .nav{padding:1rem;} .nav-links{display:none;} .hero-content{padding:1rem;} .search-engine{padding:1.25rem;} .chat-panel{width:100%;right:0;bottom:0;border-radius:20px 20px 0 0;max-height:80vh;} .chat-fab{bottom:1rem;right:1rem;width:50px;height:50px;font-size:1.2rem;} .results-section,.bundle-section,.points-section,.getaways-section,.agent-dashboard{padding:1.5rem;} .results-layout{grid-template-columns:1fr;} .filters-panel{position:static;} .result-main{grid-template-columns:1fr;text-align:center;} .price-block{text-align:center;} .rating-block{justify-content:center;} .price-points{justify-content:center;} .result-actions{justify-content:center;} .modal{max-width:100%;border-radius:0;} .payment-methods{grid-template-columns:1fr;} .card-row{grid-template-columns:1fr;} .agent-strip{gap:0.5rem;} .agent-chip{padding:0.4rem 0.75rem;font-size:0.75rem;} .workflow-step{flex-direction:column;gap:0.75rem;} .workflow-step-status{margin-left:0;margin-top:0.5rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">AI Travel Agents analyzing your request...</div>
+  <div class="loading-sub">Comparing Aeroplan, LifeMiles, KrisFlyer, MileagePlus & more</div>
+</div>
+
+<section class="hero" id="heroSection">
+  <nav class="nav">
+    <a href="#" class="logo" onclick="showSection('hero')">
+      <div class="logo-icon"><i class="fas fa-plane-departure"></i></div>
+      <div>
+        <div class="logo-text">Gomaa-ViajeLite</div>
+        <div class="logo-sub">AI Agentic Travel Team</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#" onclick="showSection('hero')">Search</a></li>
+      <li><a href="#" onclick="showSection('bundles')">Bundles</a></li>
+      <li><a href="#" onclick="showSection('points')">Points</a></li>
+      <li><a href="#" onclick="showSection('getaways')">Getaways</a></li>
+      <li><a href="#" onclick="showSection('agents')">AI Team</a></li>
+    </ul>
+  </nav>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      <i class="fas fa-sparkles"></i>
+      Star Alliance AI-Powered Agentic Comparator
+    </div>
+    <h1>Your AI Travel Team.<br>From Chat to <span>Confirmation</span>.</h1>
+    <p class="hero-subtitle">
+      6 specialized AI agents handle your entire trip: Discovery, Comparison, Booking, Payment & Support.
+      No ads. No nonsense. Just the best deals across all Star Alliance rewards programs.
+    </p>
+
+    <div class="agent-strip">
+      <div class="agent-chip" id="agent-discovery" onclick="activateAgent('discovery')">
+        <i class="fas fa-search"></i> Discovery Agent
+      </div>
+      <div class="agent-chip" id="agent-comparator" onclick="activateAgent('comparator')">
+        <i class="fas fa-balance-scale"></i> Comparator Agent
+      </div>
+      <div class="agent-chip" id="agent-bundler" onclick="activateAgent('bundler')">
+        <i class="fas fa-suitcase"></i> Bundle Agent
+      </div>
+      <div class="agent-chip" id="agent-booking" onclick="activateAgent('booking')">
+        <i class="fas fa-ticket"></i> Booking Agent
+      </div>
+      <div class="agent-chip" id="agent-payment" onclick="activateAgent('payment')">
+        <i class="fas fa-credit-card"></i> Payment Agent
+      </div>
+      <div class="agent-chip" id="agent-support" onclick="activateAgent('support')">
+        <i class="fas fa-headset"></i> Support Agent
+      </div>
+    </div>
+
+    <div class="search-engine">
+      <div class="search-tabs">
+        <button class="search-tab active" data-tab="flight" onclick="setSearchTab('flight')"><i class="fas fa-plane"></i> Flights</button>
+        <button class="search-tab" data-tab="hotel" onclick="setSearchTab('hotel')"><i class="fas fa-hotel"></i> Hotels</button>
+        <button class="search-tab" data-tab="car" onclick="setSearchTab('car')"><i class="fas fa-car"></i> Cars</button>
+        <button class="search-tab" data-tab="bundle" onclick="setSearchTab('bundle')"><i class="fas fa-suitcase"></i> Bundle</button>
+      </div>
+
+      <div class="search-grid">
+        <div class="search-field">
+          <label>From</label>
+          <i class="fas fa-map-marker-alt"></i>
+          <input type="text" id="origin" placeholder="New York (JFK)" value="New York (JFK)">
+        </div>
+        <div class="search-field">
+          <label>To</label>
+          <i class="fas fa-map-marker-alt"></i>
+          <input type="text" id="dest" placeholder="Rome (FCO)" value="Rome (FCO)">
+        </div>
+        <div class="search-field">
+          <label>Depart</label>
+          <i class="fas fa-calendar"></i>
+          <input type="date" id="departDate" value="2026-08-15">
+        </div>
+        <div class="search-field">
+          <label>Return</label>
+          <i class="fas fa-calendar"></i>
+          <input type="date" id="returnDate" value="2026-08-22">
+        </div>
+        <div class="search-field">
+          <label>Travelers</label>
+          <i class="fas fa-user"></i>
+          <select id="travelers">
+            <option value="1">1 Adult</option>
+            <option value="2" selected>2 Adults</option>
+            <option value="2c1">2 Adults, 1 Child</option>
+            <option value="2c2">2 Adults, 2 Children</option>
+          </select>
+        </div>
+        <div class="search-field">
+          <label>Cabin</label>
+          <i class="fas fa-chair"></i>
+          <select id="cabin">
+            <option value="economy" selected>Economy</option>
+            <option value="premium">Premium Economy</option>
+            <option value="business">Business</option>
+            <option value="first">First Class</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="search-actions">
+        <button class="btn-primary" onclick="performSearch()"><i class="fas fa-search"></i> Search Deals</button>
+        <button class="btn-secondary" onclick="openChat()"><i class="fas fa-robot"></i> Ask AI Agent</button>
+        <button class="btn-secondary" onclick="showSection('bundles')"><i class="fas fa-magic"></i> AI Bundle Builder</button>
+      </div>
+
+      <div class="rewards-toggle">
+        <label class="toggle-switch">
+          <input type="checkbox" id="rewardsToggle" checked>
+          <span class="toggle-slider"></span>
+        </label>
+        <span><strong>Optimize for Points & Miles</strong> — Show best redemption options alongside cash prices</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="results-section" id="resultsSection">
+  <div class="results-header">
+    <div>
+      <h2 class="results-title">Best Deals Found</h2>
+      <p class="results-count" id="resultsCount">Searching across 8 Star Alliance programs...</p>
+    </div>
+    <div class="sort-controls">
+      <button class="sort-btn active" onclick="sortResults('price')">Cheapest First</button>
+      <button class="sort-btn" onclick="sortResults('points')">Best Points Value</button>
+      <button class="sort-btn" onclick="sortResults('rating')">Highest Rated</button>
+      <button class="sort-btn" onclick="sortResults('duration')">Shortest</button>
+    </div>
+  </div>
+
+  <div class="rewards-panel" id="rewardsPanel">
+    <h3><i class="fas fa-crown"></i> Points & Miles Opportunities</h3>
+    <p>These Star Alliance programs offer the best redemption value for your route. Transfer partners shown for easy point accumulation.</p>
+    <div class="rewards-grid" id="rewardsGrid"></div>
+  </div>
+
+  <div class="results-layout">
+    <aside class="filters-panel">
+      <div class="filter-group">
+        <div class="filter-label"><i class="fas fa-filter"></i> Airlines</div>
+        <div class="filter-options">
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> United Airlines</label>
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> Lufthansa</label>
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> ANA</label>
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> Singapore Airlines</label>
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> Turkish Airlines</label>
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> Air Canada</label>
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> Avianca</label>
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> TAP Portugal</label>
+        </div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label"><i class="fas fa-stopwatch"></i> Stops</div>
+        <div class="filter-options">
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> Nonstop</label>
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> 1 Stop</label>
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> 2+ Stops</label>
+        </div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label"><i class="fas fa-dollar-sign"></i> Price Range</div>
+        <div class="price-range">
+          <input type="number" placeholder="Min" value="0" onchange="filterResults()">
+          <span>-</span>
+          <input type="number" placeholder="Max" value="5000" onchange="filterResults()">
+        </div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label"><i class="fas fa-gem"></i> Rewards Program</div>
+        <div class="filter-options">
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> Aeroplan</label>
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> LifeMiles</label>
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> MileagePlus</label>
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> KrisFlyer</label>
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> ANA Mileage Club</label>
+          <label class="filter-option"><input type="checkbox" checked onchange="filterResults()"> Miles&Smiles</label>
+        </div>
+      </div>
+    </aside>
+    <div class="results-list" id="resultsList"></div>
+  </div>
+</section>
+
+<section class="bundle-section" id="bundleSection">
+  <div class="bundle-builder">
+    <div class="bundle-header">
+      <h2><i class="fas fa-suitcase-rolling"></i> AI Bundle Builder</h2>
+      <p>Combine Flight + Hotel + Car for maximum savings. Our AI agents find the best package deals across Star Alliance partners.</p>
+    </div>
+    <div class="bundle-tabs">
+      <button class="bundle-tab active" onclick="setBundleTab('flight',this)"><i class="fas fa-plane"></i> Select Flight</button>
+      <button class="bundle-tab" onclick="setBundleTab('hotel',this)"><i class="fas fa-hotel"></i> Select Hotel</button>
+      <button class="bundle-tab" onclick="setBundleTab('car',this)"><i class="fas fa-car"></i> Select Car</button>
+      <button class="bundle-tab" onclick="setBundleTab('summary',this)"><i class="fas fa-receipt"></i> Summary</button>
+    </div>
+    <div class="bundle-content" id="bundleContent">
+      <div class="bundle-grid" id="bundleFlightGrid"></div>
+    </div>
+  </div>
+</section>
+
+<section class="points-section" id="pointsSection">
+  <div class="results-header">
+    <div>
+      <h2 class="results-title">Points & Miles Optimizer</h2>
+      <p class="results-count">Compare Star Alliance programs side-by-side for your route</p>
+    </div>
+  </div>
+  <div class="points-grid" id="pointsGrid"></div>
+</section>
+
+<section class="getaways-section" id="getawaysSection">
+  <div class="results-header">
+    <div>
+      <h2 class="results-title">Curated Getaways</h2>
+      <p class="results-count">From cheapest escapes to best-rated experiences — sorted for you</p>
+    </div>
+    <div class="sort-controls">
+      <button class="sort-btn active" onclick="sortGetaways('price')">Budget First</button>
+      <button class="sort-btn" onclick="sortGetaways('rating')">Best Rated</button>
+      <button class="sort-btn" onclick="sortGetaways('value')">Best Value</button>
+    </div>
+  </div>
+  <div class="getaways-grid" id="getawaysGrid"></div>
+</section>
+
+<section class="agent-dashboard" id="agentDashboard">
+  <div class="agent-workflow">
+    <div class="workflow-header">
+      <h2><i class="fas fa-robot"></i> AI Agent Workflow</h2>
+      <p>Track your trip through every stage of our agentic pipeline — from discovery to confirmation.</p>
+    </div>
+    <div class="workflow-body">
+      <div class="workflow-timeline" id="workflowTimeline"></div>
+    </div>
+  </div>
+</section>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+      <div class="chat-header-info">
+        <h4>Viaje AI Concierge</h4>
+        <p>Your personal travel agent</p>
+      </div>
+    </div>
+    <button class="chat-close" onclick="closeChat()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="chat-body" id="chatBody">
+    <div class="chat-message agent">
+      <div class="chat-bubble">
+        Hola! I am your Viaje AI Concierge. I can help you plan, compare, book, and pay for your entire trip. What destination are you dreaming of?
+        <div class="quick-replies">
+          <span class="quick-reply" onclick="sendQuickReply('I want to go to Rome')">Rome</span>
+          <span class="quick-reply" onclick="sendQuickReply('I want to go to Barcelona')">Barcelona</span>
+          <span class="quick-reply" onclick="sendQuickReply('I want to go to Tokyo')">Tokyo</span>
+          <span class="quick-reply" onclick="sendQuickReply('I want to go to Paris')">Paris</span>
+          <span class="quick-reply" onclick="sendQuickReply('I want to go to Bali')">Bali</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chat-input-area">
+    <input type="text" class="chat-input" id="chatInput" placeholder="Tell me about your trip..." onkeypress="if(event.key==='Enter')sendChatMessage()">
+    <button class="chat-send" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+<button class="chat-fab" id="chatFab" onclick="toggleChat()"><i class="fas fa-comments"></i></button>
+
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-ticket"></i> Complete Your Booking</h3>
+      <button class="modal-close" onclick="closeBookingModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="step-indicator">
+        <div class="step-dot active" id="step1"><span class="step-label">Review</span>1</div>
+        <div class="step-dot" id="step2"><span class="step-label">Traveler</span>2</div>
+        <div class="step-dot" id="step3"><span class="step-label">Payment</span>3</div>
+        <div class="step-dot" id="step4"><span class="step-label">Confirm</span>4</div>
+      </div>
+
+      <div class="booking-step active" id="bookingStep1">
+        <div class="booking-summary">
+          <h4><i class="fas fa-plane"></i> Flight Summary</h4>
+          <div id="bookingFlightSummary"></div>
+        </div>
+        <div class="form-group">
+          <label>Promo Code / Rewards Number</label>
+          <input type="text" placeholder="Enter promo code or frequent flyer number">
+        </div>
+        <div style="display:flex;gap:1rem;justify-content:flex-end;">
+          <button class="btn-outline" onclick="closeBookingModal()">Cancel</button>
+          <button class="btn-book" onclick="nextBookingStep(2)">Continue <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <div class="booking-step" id="bookingStep2">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name *</label>
+            <input type="text" id="travelerFirstName" placeholder="John">
+          </div>
+          <div class="form-group">
+            <label>Last Name *</label>
+            <input type="text" id="travelerLastName" placeholder="Doe">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" id="travelerEmail" placeholder="john@example.com">
+          </div>
+          <div class="form-group">
+            <label>Phone *</label>
+            <input type="tel" id="travelerPhone" placeholder="+1 (555) 000-0000">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date of Birth *</label>
+            <input type="date" id="travelerDOB">
+          </div>
+          <div class="form-group">
+            <label>Passport Number</label>
+            <input type="text" placeholder="Optional for domestic">
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem;justify-content:flex-end;">
+          <button class="btn-outline" onclick="prevBookingStep(1)">Back</button>
+          <button class="btn-book" onclick="nextBookingStep(3)">Continue <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <div class="booking-step" id="bookingStep3">
+        <div class="booking-summary">
+          <h4><i class="fas fa-receipt"></i> Order Total</h4>
+          <div id="paymentSummary"></div>
+        </div>
+        <div class="form-group">
+          <label>Select Payment Method</label>
+          <div class="payment-methods">
+            <div class="payment-method selected" onclick="selectPayment(this,'card')">
+              <i class="fas fa-credit-card"></i>
+              <span>Credit Card</span>
+            </div>
+            <div class="payment-method" onclick="selectPayment(this,'paypal')">
+              <i class="fab fa-paypal"></i>
+              <span>PayPal</span>
+            </div>
+            <div class="payment-method" onclick="selectPayment(this,'points')">
+              <i class="fas fa-gem"></i>
+              <span>Points Pay</span>
+            </div>
+          </div>
+        </div>
+        <div id="cardForm">
+          <div class="form-group">
+            <label>Card Number</label>
+            <div class="card-element">
+              <input type="text" placeholder="0000 0000 0000 0000" style="border:none;background:transparent;padding:0;width:100%;">
+            </div>
+          </div>
+          <div class="card-row">
+            <div class="form-group">
+              <label>Cardholder Name</label>
+              <input type="text" placeholder="John Doe">
+            </div>
+            <div class="form-group">
+              <label>Expiry</label>
+              <input type="text" placeholder="MM/YY">
+            </div>
+            <div class="form-group">
+              <label>CVC</label>
+              <input type="text" placeholder="123">
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem;justify-content:flex-end;">
+          <button class="btn-outline" onclick="prevBookingStep(2)">Back</button>
+          <button class="btn-book" onclick="processPayment()"><i class="fas fa-lock"></i> Pay Securely</button>
+        </div>
+      </div>
+
+      <div class="booking-step" id="bookingStep4">
+        <div class="payment-success">
+          <div class="success-icon"><i class="fas fa-check"></i></div>
+          <h3>Booking Confirmed!</h3>
+          <p>Your trip has been successfully booked. Check your email for confirmation details.</p>
+          <div class="ticket-preview">
+            <h4><i class="fas fa-ticket-alt"></i> E-Ticket Preview</h4>
+            <div id="ticketPreviewContent"></div>
+          </div>
+          <div style="display:flex;gap:1rem;justify-content:center;">
+            <button class="btn-outline" onclick="downloadTicket()"><i class="fas fa-download"></i> Download E-Ticket</button>
+            <button class="btn-book" onclick="closeBookingModal();showSection('agents');"><i class="fas fa-headset"></i> Get Support</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h4>Star Alliance Partners</h4>
+      <a href="https://www.aircanada.com/aeroplan" target="_blank">Air Canada Aeroplan</a>
+      <a href="https://www.lifemiles.com" target="_blank">Avianca LifeMiles</a>
+      <a href="https://www.ana.co.jp/en/us/amc/" target="_blank">ANA Mileage Club</a>
+      <a href="https://www.singaporeair.com/en_UK/ppsclub-krisflyer/" target="_blank">Singapore KrisFlyer</a>
+      <a href="https://www.united.com/en/us/mileageplus" target="_blank">United MileagePlus</a>
+      <a href="https://www.turkishairlines.com/en-int/miles-and-smiles/" target="_blank">Turkish Miles&Smiles</a>
+    </div>
+    <div class="footer-col">
+      <h4>Points Transfer Partners</h4>
+      <a href="https://www.americanexpress.com/rewards/" target="_blank">Amex Membership Rewards</a>
+      <a href="https://www.chase.com/personal/credit-cards/ultimate-rewards" target="_blank">Chase Ultimate Rewards</a>
+      <a href="https://www.capitalone.com/rewards/" target="_blank">Capital One Rewards</a>
+      <a href="https://www.citi.com/credit-cards/citi-thankyou-rewards" target="_blank">Citi ThankYou Rewards</a>
+      <a href="https://www.biltrewards.com" target="_blank">Bilt Rewards</a>
+      <a href="https://www.marriott.com/loyalty.mi" target="_blank">Marriott Bonvoy</a>
+    </div>
+    <div class="footer-col">
+      <h4>Booking Platforms</h4>
+      <a href="https://www.flightpoints.com" target="_blank">FlightPoints</a>
+      <a href="https://awardfares.com" target="_blank">AwardFares</a>
+      <a href="https://www.point.me" target="_blank">Point.me</a>
+      <a href="https://www.seats.aero" target="_blank">Seats.aero</a>
+      <a href="https://www.nerdwallet.com/travel" target="_blank">NerdWallet Travel</a>
+    </div>
+    <div class="footer-col">
+      <h4>About Gomaa-ViajeLite</h4>
+      <a href="#" onclick="showSection('agents')">How AI Agents Work</a>
+      <a href="#" onclick="showSection('points')">Points Calculator</a>
+      <a href="#" onclick="showSection('getaways')">Sweet Spots Guide</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>2026 Gomaa-ViajeLite. An independent travel comparator. Not affiliated with Star Alliance or its member airlines.</p>
+    <p style="margin-top:0.5rem;">Built with love for travelers who refuse to overpay. No ads. No tracking. Just deals.</p>
+  </div>
+</footer>
+
+<script>
+// ===== DATA =====
+const flightData = [
+  { id:1, airline:'united', name:'United Airlines', code:'UA', from:'JFK', to:'FCO', dep:'18:30', arr:'08:45+1', duration:'8h 15m', stops:0, price:487, originalPrice:625, points:'35,000', program:'MileagePlus', rating:4.2, reviews:2847, aircraft:'Boeing 787-9', baggage:'1 checked bag', meal:'Complimentary meals', wifi:'Wi-Fi available', seat:'Economy Plus available', transferPartners:['Chase UR','Bilt','Marriott'], featured:true },
+  { id:2, airline:'lufthansa', name:'Lufthansa', code:'LH', from:'JFK', to:'FCO', dep:'22:15', arr:'14:30+1', duration:'10h 15m', stops:1, stopCity:'FRA', price:412, originalPrice:580, points:'30,000', program:'Miles & More', rating:4.5, reviews:1923, aircraft:'Airbus A350-900', baggage:'1 checked bag', meal:'Full dining', wifi:'Wi-Fi available', seat:'Lie-flat Business', transferPartners:['Amex MR','Capital One','Citi TY'], featured:false },
+  { id:3, airline:'aeroplan', name:'Air Canada', code:'AC', from:'JFK', to:'FCO', dep:'17:45', arr:'07:20+1', duration:'9h 35m', stops:1, stopCity:'YYZ', price:445, originalPrice:590, points:'28,000', program:'Aeroplan', rating:4.3, reviews:1567, aircraft:'Boeing 777-300ER', baggage:'1 checked bag', meal:'Complimentary meals', wifi:'Wi-Fi available', seat:'Premium Economy', transferPartners:['Amex MR','Chase UR','Capital One','Bilt','Marriott'], featured:false },
+  { id:4, airline:'turkish', name:'Turkish Airlines', code:'TK', from:'JFK', to:'FCO', dep:'23:55', arr:'17:10+1', duration:'11h 15m', stops:1, stopCity:'IST', price:389, originalPrice:520, points:'32,000', program:'Miles&Smiles', rating:4.6, reviews:3421, aircraft:'Boeing 787-9', baggage:'2 checked bags', meal:'Award-winning catering', wifi:'Free Wi-Fi', seat:'Lie-flat Business', transferPartners:['Capital One','Citi TY','Marriott'], pointsSweet:true },
+  { id:5, airline:'singapore', name:'Singapore Airlines', code:'SQ', from:'JFK', to:'FCO', dep:'20:00', arr:'12:30+1', duration:'10h 30m', stops:1, stopCity:'FRA', price:523, originalPrice:710, points:'40,000', program:'KrisFlyer', rating:4.8, reviews:4102, aircraft:'Airbus A380', baggage:'1 checked bag', meal:'Book the Cook', wifi:'Free Wi-Fi', seat:'Lie-flat Business', transferPartners:['Amex MR','Chase UR','Capital One','Citi TY','Marriott'], pointsSweet:true },
+  { id:6, airline:'ana', name:'ANA', code:'NH', from:'JFK', to:'FCO', dep:'11:30', arr:'05:45+1', duration:'10h 15m', stops:1, stopCity:'NRT', price:498, originalPrice:650, points:'38,000', program:'ANA Mileage Club', rating:4.7, reviews:2156, aircraft:'Boeing 777-300ER', baggage:'2 checked bags', meal:'Kaiseki dining', wifi:'Wi-Fi available', seat:'The Room Business', transferPartners:['Amex MR','Marriott'], featured:false },
+  { id:7, airline:'avianca', name:'Avianca', code:'AV', from:'JFK', to:'FCO', dep:'15:20', arr:'09:00+1', duration:'11h 40m', stops:1, stopCity:'BOG', price:356, originalPrice:480, points:'25,000', program:'LifeMiles', rating:4.0, reviews:987, aircraft:'Boeing 787-8', baggage:'1 checked bag', meal:'Complimentary meals', wifi:'Wi-Fi available', seat:'Economy', transferPartners:['Amex MR','Capital One','Citi TY','Marriott'], featured:false },
+  { id:8, airline:'tap', name:'TAP Portugal', code:'TP', from:'JFK', to:'FCO', dep:'23:30', arr:'15:45+1', duration:'10h 15m', stops:1, stopCity:'LIS', price:378, originalPrice:495, points:'27,000', program:'TAP Miles&Go', rating:4.1, reviews:1345, aircraft:'Airbus A330-900neo', baggage:'1 checked bag', meal:'Portuguese cuisine', wifi:'Wi-Fi available', seat:'Economy', transferPartners:['Capital One','Marriott'], featured:false },
+];
+
+const hotelData = [
+  { id:1, name:'Hotel Artis', location:'Rome Centro', price:89, originalPrice:120, rating:4.2, reviews:892, image:'family', includes:['Breakfast','WiFi','Airport shuttle'], stars:3 },
+  { id:2, name:'Hotel Santa Maria', location:'Trastevere, Rome', price:145, originalPrice:195, rating:4.6, reviews:1243, image:'romantic', includes:['Breakfast','WiFi','Rooftop terrace','Spa access'], stars:4 },
+  { id:3, name:'The Westin Excelsior', location:'Via Veneto, Rome', price:289, originalPrice:420, rating:4.7, reviews:2104, image:'luxury', includes:['Breakfast','WiFi','Spa','Pool','Concierge'], stars:5 },
+  { id:4, name:'Generator Rome', location:'Rome Termini', price:45, originalPrice:65, rating:4.0, reviews:3456, image:'solo', includes:['WiFi','Shared kitchen','Lockers'], stars:2 },
+  { id:5, name:'Rome Cavalieri', location:'Monte Mario', price:450, originalPrice:680, rating:4.8, reviews:1876, image:'luxury', includes:['Breakfast','WiFi','3 pools','Spa','Michelin dining'], stars:5 },
+  { id:6, name:'Hotel Quirinale', location:'Rome Centro', price:112, originalPrice:155, rating:4.3, reviews:1567, image:'budget', includes:['Breakfast','WiFi','Garden','Bar'], stars:4 },
+];
+
+const carData = [
+  { id:1, company:'Hertz', type:'Economy', model:'Fiat 500', price:32, originalPrice:45, rating:4.1, features:['Air conditioning','Manual','2 bags'], image:'car' },
+  { id:2, company:'Avis', type:'Compact', model:'Volkswagen Golf', price:38, originalPrice:52, rating:4.3, features:['Air conditioning','Automatic','3 bags'], image:'car' },
+  { id:3, company:'Enterprise', type:'SUV', model:'Jeep Compass', price:65, originalPrice:89, rating:4.4, features:['Air conditioning','Automatic','4 bags','GPS'], image:'car' },
+  { id:4, company:'Sixt', type:'Luxury', model:'BMW 3 Series', price:95, originalPrice:130, rating:4.6, features:['Air conditioning','Automatic','3 bags','GPS','Leather'], image:'car' },
+  { id:5, company:'Budget', type:'Economy', model:'Peugeot 208', price:28, originalPrice:40, rating:4.0, features:['Air conditioning','Manual','2 bags'], image:'car' },
+];
+
+const getawayData = [
+  { id:1, name:'Roman Holiday', destination:'Rome, Italy', price:487, per:'per person', rating:4.6, reviews:3241, includes:['Flight','Hotel 4*','Breakfast','Walking tour'], image:'romantic', type:'Couples', duration:'5 nights' },
+  { id:2, name:'Barcelona Beach Break', destination:'Barcelona, Spain', price:356, per:'per person', rating:4.5, reviews:2890, includes:['Flight','Hotel 3*','Breakfast','Sagrada Familia skip-line'], image:'adventure', type:'City', duration:'4 nights' },
+  { id:3, name:'Amalfi Coast Escape', destination:'Amalfi, Italy', price:723, per:'per person', rating:4.8, reviews:1567, includes:['Flight','Boutique hotel','Breakfast','Boat tour'], image:'luxury', type:'Luxury', duration:'6 nights' },
+  { id:4, name:'Tuscan Wine Country', destination:'Florence, Italy', price:534, per:'per person', rating:4.7, reviews:2103, includes:['Flight','Villa stay','Wine tasting','Cooking class'], image:'romantic', type:'Food & Wine', duration:'5 nights' },
+  { id:5, name:'Madrid City Hopper', destination:'Madrid, Spain', price:298, per:'per person', rating:4.3, reviews:4567, includes:['Flight','Hostel','Free walking tour'], image:'solo', type:'Budget', duration:'3 nights' },
+  { id:6, name:'Sicily Family Adventure', destination:'Palermo, Italy', price:612, per:'per person', rating:4.4, reviews:1876, includes:['Flight','Family resort','All meals','Kids club'], image:'family', type:'Family', duration:'7 nights' },
+];
+
+const pointsPrograms = [
+  { name:'Air Canada Aeroplan', icon:'fa-plane', color:'#e31937', sweetSpots:['US West Coast to Hawaii: 25K Business','Europe to Middle East: 45K Business','North America to Europe: 70K Business'], transfers:['Amex MR','Chase UR','Capital One','Bilt','Marriott'], fees:'No fuel surcharges. C$39 partner fee.', url:'https://www.aircanada.com/aeroplan' },
+  { name:'Avianca LifeMiles', icon:'fa-gem', color:'#d52b1e', sweetSpots:['North America to Europe: 63K Business','Short-haul US: 7.5K Economy','North America to South America: 35K Business'], transfers:['Amex MR','Capital One','Citi TY','Marriott'], fees:'No fuel surcharges. Miles + Cash available.', url:'https://www.lifemiles.com' },
+  { name:'United MileagePlus', icon:'fa-globe', color:'#002244', sweetSpots:['US Domestic Saver Awards','Excursionist Perk (free segment)','Partner Awards with no surcharges'], transfers:['Chase UR','Bilt','Marriott'], fees:'No fuel surcharges on partners.', url:'https://www.united.com/en/us/mileageplus' },
+  { name:'Singapore KrisFlyer', icon:'fa-star', color:'#fbae17', sweetSpots:['US Domestic on United: 28K RT','Singapore Suites (only via KrisFlyer)','Star Alliance Partners'], transfers:['Amex MR','Chase UR','Capital One','Citi TY','Marriott'], fees:'Low carrier surcharges.', url:'https://www.singaporeair.com/en_UK/ppsclub-krisflyer/' },
+  { name:'ANA Mileage Club', icon:'fa-circle', color:'#13448f', sweetSpots:['North America to Europe: 55K RT Business','Japan to Europe: 58K Business','Round-trip required'], transfers:['Amex MR','Marriott'], fees:'Carrier surcharges apply.', url:'https://www.ana.co.jp/en/us/amc/' },
+  { name:'Turkish Miles&Smiles', icon:'fa-moon', color:'#c8102e', sweetSpots:['North America to Europe: 45K Business','Domestic Turkey: 7.5K Economy','Generous stopover policy'], transfers:['Capital One','Citi TY','Marriott'], fees:'Low surcharges.', url:'https://www.turkishairlines.com/en-int/miles-and-smiles/' },
+];
+
+const agentWorkflow = [
+  { id:'discovery', name:'Discovery Agent', icon:'fa-search', color:'#3b82f6', desc:'Analyzes your preferences, budget, and travel goals to find the perfect destinations.', status:'completed' },
+  { id:'comparator', name:'Comparator Agent', icon:'fa-balance-scale', color:'#8b5cf6', desc:'Scans all Star Alliance programs, cash fares, and points redemptions in real-time.', status:'completed' },
+  { id:'bundler', name:'Bundle Agent', icon:'fa-suitcase', color:'#f59e0b', desc:'Combines flights, hotels, and cars for maximum savings and convenience.', status:'active' },
+  { id:'booking', name:'Booking Agent', icon:'fa-ticket', color:'#10b981', desc:'Handles seat selection, special requests, and confirmation details.', status:'pending' },
+  { id:'payment', name:'Payment Agent', icon:'fa-credit-card', color:'#ec4899', desc:'Processes secure payment with points, card, or PayPal options.', status:'pending' },
+  { id:'support', name:'Support Agent', icon:'fa-headset', color:'#0f766e', desc:'Available 24/7 for changes, cancellations, and travel assistance.', status:'pending' },
+];
+
+let currentSort = 'price';
+let currentSearchTab = 'flight';
+let currentBundleTab = 'flight';
+let selectedBundle = { flight:null, hotel:null, car:null };
+let currentBookingStep = 1;
+let selectedFlight = null;
+
+// ===== SECTION NAVIGATION =====
+function showSection(section) {
+  document.querySelectorAll('.results-section, .bundle-section, .points-section, .getaways-section, .agent-dashboard').forEach(s => s.classList.remove('active'));
+  document.getElementById('heroSection').style.display = section === 'hero' ? 'flex' : 'none';
+  if(section === 'results') document.getElementById('resultsSection').classList.add('active');
+  if(section === 'bundles') { document.getElementById('bundleSection').classList.add('active'); renderBundleFlights(); }
+  if(section === 'points') { document.getElementById('pointsSection').classList.add('active'); renderPoints(); }
+  if(section === 'getaways') { document.getElementById('getawaysSection').classList.add('active'); renderGetaways(); }
+  if(section === 'agents') { document.getElementById('agentDashboard').classList.add('active'); renderWorkflow(); }
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+// ===== SEARCH =====
+function setSearchTab(tab) {
+  currentSearchTab = tab;
+  document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+}
+
+function performSearch() {
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.classList.add('active');
+  setTimeout(() => {
+    overlay.classList.remove('active');
+    showSection('results');
+    renderResults();
+    renderRewardsPanel();
+  }, 2000);
+}
+
+// ===== RESULTS RENDERING =====
+function renderResults() {
+  const list = document.getElementById('resultsList');
+  const rewardsOn = document.getElementById('rewardsToggle').checked;
+  let data = [...flightData];
+
+  if(currentSort === 'price') data.sort((a,b) => a.price - b.price);
+  if(currentSort === 'points') data.sort((a,b) => parseInt(a.points.replace(/,/g,'')) - parseInt(b.points.replace(/,/g,'')));
+  if(currentSort === 'rating') data.sort((a,b) => b.rating - a.rating);
+  if(currentSort === 'duration') data.sort((a,b) => {
+    const da = parseInt(a.duration.split('h')[0])*60 + parseInt(a.duration.split(' ')[1]);
+    const db = parseInt(b.duration.split('h')[0])*60 + parseInt(b.duration.split(' ')[1]);
+    return da - db;
+  });
+
+  document.getElementById('resultsCount').textContent = `${data.length} deals found across Star Alliance partners`;
+
+  list.innerHTML = data.map(f => `
+    <div class="result-card ${f.featured ? 'featured' : ''} ${f.pointsSweet ? 'points-sweet' : ''}">
+      <div class="result-main">
+        <div class="airline-logo ${f.airline}">${f.code}</div>
+        <div class="flight-info">
+          <h3>${f.name} ${f.code}${100+f.id}</h3>
+          <div class="flight-route">
+            <strong>${f.from}</strong> <span class="arrow"><i class="fas fa-arrow-right"></i></span> <strong>${f.to}</strong>
+            <span class="stops-badge ${f.stops === 0 ? 'direct' : 'stop'}">${f.stops === 0 ? '<i class="fas fa-bolt"></i> Direct' : '<i class="fas fa-stopwatch"></i> ' + f.stops + ' Stop' + (f.stops > 1 ? 's' : '') + (f.stopCity ? ' (' + f.stopCity + ')' : '')}</span>
+          </div>
+          <div class="flight-meta">
+            <span><i class="fas fa-clock"></i> ${f.duration}</span>
+            <span><i class="fas fa-plane"></i> ${f.aircraft}</span>
+            <span><i class="fas fa-suitcase"></i> ${f.baggage}</span>
+            <span><i class="fas fa-utensils"></i> ${f.meal}</span>
+          </div>
+        </div>
+        <div class="price-block">
+          ${f.originalPrice ? `<div class="price-original">$${f.originalPrice}</div>` : ''}
+          <div class="price-current"><span class="currency">$</span>${f.price}</div>
+          ${rewardsOn ? `<div class="price-points"><i class="fas fa-gem"></i> ${f.points} ${f.program}</div>` : ''}
+          ${f.originalPrice ? `<div class="savings-tag"><i class="fas fa-tag"></i> Save $${f.originalPrice - f.price}</div>` : ''}
+          <div class="rating-block">
+            <div class="stars">${Array(5).fill(0).map((_,i) => `<i class="fas fa-star${i < Math.floor(f.rating) ? '' : '-half-alt'}"></i>`).join('')}</div>
+            <span class="rating-text">${f.rating} (${f.reviews.toLocaleString()})</span>
+          </div>
+        </div>
+      </div>
+      <div class="result-details">
+        <div class="detail-item"><i class="fas fa-wifi"></i><div><div class="detail-label">Wi-Fi</div><div class="detail-value">${f.wifi}</div></div></div>
+        <div class="detail-item"><i class="fas fa-chair"></i><div><div class="detail-label">Seat</div><div class="detail-value">${f.seat}</div></div></div>
+        <div class="detail-item"><i class="fas fa-exchange-alt"></i><div><div class="detail-label">Transfer Partners</div><div class="detail-value">${f.transferPartners.join(', ')}</div></div></div>
+      </div>
+      <div class="result-actions">
+        <button class="btn-book" onclick="openBooking(${f.id})"><i class="fas fa-ticket"></i> Book Now</button>
+        <button class="btn-outline" onclick="window.open('https://www.google.com/flights?hl=en#flt=${f.from}.${f.to}.${document.getElementById('departDate').value}*${f.to}.${f.from}.${document.getElementById('returnDate').value};c:USD;e:1;sd:1;t:f;tt:o', '_blank')"><i class="fas fa-external-link-alt"></i> View on Google Flights</button>
+        ${rewardsOn ? `<button class="btn-rewards" onclick="window.open('${getProgramUrl(f.program)}', '_blank')"><i class="fas fa-gem"></i> Book with Points</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function getProgramUrl(program) {
+  const urls = {
+    'MileagePlus':'https://www.united.com/en/us/mileageplus',
+    'Miles & More':'https://www.miles-and-more.com',
+    'Aeroplan':'https://www.aircanada.com/aeroplan',
+    'Miles&Smiles':'https://www.turkishairlines.com/en-int/miles-and-smiles/',
+    'KrisFlyer':'https://www.singaporeair.com/en_UK/ppsclub-krisflyer/',
+    'ANA Mileage Club':'https://www.ana.co.jp/en/us/amc/',
+    'LifeMiles':'https://www.lifemiles.com',
+    'TAP Miles&Go':'https://www.flytap.com/en-en/miles-and-go'
+  };
+  return urls[program] || '#';
+}
+
+function sortResults(type) {
+  currentSort = type;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderResults();
+}
+
+function filterResults() {
+  renderResults();
+}
+
+// ===== REWARDS PANEL =====
+function renderRewardsPanel() {
+  const panel = document.getElementById('rewardsPanel');
+  const grid = document.getElementById('rewardsGrid');
+  const rewardsOn = document.getElementById('rewardsToggle').checked;
+
+  if(!rewardsOn) { panel.classList.remove('active'); return; }
+  panel.classList.add('active');
+
+  grid.innerHTML = pointsPrograms.slice(0,4).map(p => `
+    <div class="reward-card">
+      <h4><i class="fas ${p.icon}"></i> ${p.name}</h4>
+      <div class="reward-value">${p.sweetSpots[0]}</div>
+      <div class="reward-desc">${p.fees}</div>
+      <div style="margin-top:0.5rem;font-size:0.75rem;opacity:0.6;">Transfer from: ${p.transfers.join(', ')}</div>
+      <a href="${p.url}" target="_blank" class="reward-link">Open Program <i class="fas fa-arrow-right"></i></a>
+    </div>
+  `).join('');
+}
+
+// ===== BUNDLE BUILDER =====
+function setBundleTab(tab, btn) {
+  currentBundleTab = tab;
+  document.querySelectorAll('.bundle-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+
+  const content = document.getElementById('bundleContent');
+  if(tab === 'flight') renderBundleFlights();
+  if(tab === 'hotel') renderBundleHotels();
+  if(tab === 'car') renderBundleCars();
+  if(tab === 'summary') renderBundleSummary();
+}
+
+function renderBundleFlights() {
+  const grid = document.getElementById('bundleFlightGrid');
+  grid.innerHTML = flightData.slice(0,4).map(f => `
+    <div class="bundle-card ${selectedBundle.flight === f.id ? 'selected' : ''}" onclick="selectBundleItem('flight',${f.id})">
+      <h4><i class="fas fa-plane"></i> ${f.name} ${f.code}${100+f.id}</h4>
+      <div class="bundle-price">$${f.price} <span class="points-alt">or ${f.points} pts</span></div>
+      <ul class="bundle-features">
+        <li><i class="fas fa-check"></i> ${f.from} to ${f.to}</li>
+        <li><i class="fas fa-check"></i> ${f.duration} flight</li>
+        <li><i class="fas fa-check"></i> ${f.stops === 0 ? 'Nonstop' : f.stops + ' stop(s)'}</li>
+        <li><i class="fas fa-check"></i> ${f.baggage}</li>
+        <li><i class="fas fa-check"></i> ${f.rating} rating</li>
+      </ul>
+    </div>
+  `).join('');
+}
+
+function renderBundleHotels() {
+  const grid = document.getElementById('bundleFlightGrid');
+  grid.innerHTML = hotelData.map(h => `
+    <div class="bundle-card ${selectedBundle.hotel === h.id ? 'selected' : ''}" onclick="selectBundleItem('hotel',${h.id})">
+      <h4><i class="fas fa-hotel"></i> ${h.name}</h4>
+      <div class="bundle-price">$${h.price}/night <span class="points-alt">Save ${Math.round((1-h.price/h.originalPrice)*100)}%</span></div>
+      <ul class="bundle-features">
+        <li><i class="fas fa-check"></i> ${h.location}</li>
+        <li><i class="fas fa-check"></i> ${h.stars}-star property</li>
+        <li><i class="fas fa-check"></i> ${h.includes.join(', ')}</li>
+        <li><i class="fas fa-check"></i> ${h.rating} rating (${h.reviews} reviews)</li>
+      </ul>
+    </div>
+  `).join('');
+}
+
+function renderBundleCars() {
+  const grid = document.getElementById('bundleFlightGrid');
+  grid.innerHTML = carData.map(c => `
+    <div class="bundle-card ${selectedBundle.car === c.id ? 'selected' : ''}" onclick="selectBundleItem('car',${c.id})">
+      <h4><i class="fas fa-car"></i> ${c.company} ${c.model}</h4>
+      <div class="bundle-price">$${c.price}/day <span class="points-alt">${c.type}</span></div>
+      <ul class="bundle-features">
+        <li><i class="fas fa-check"></i> ${c.features.join(', ')}</li>
+        <li><i class="fas fa-check"></i> ${c.rating} rating</li>
+        <li><i class="fas fa-check"></i> Free cancellation</li>
+      </ul>
+    </div>
+  `).join('');
+}
+
+function renderBundleSummary() {
+  const content = document.getElementById('bundleContent');
+  const flight = flightData.find(f => f.id === selectedBundle.flight);
+  const hotel = hotelData.find(h => h.id === selectedBundle.hotel);
+  const car = carData.find(c => c.id === selectedBundle.car);
+  const nights = 5;
+  const days = 6;
+
+  let total = 0;
+  let html = '<div style="max-width:600px;margin:0 auto;">';
+
+  if(flight) { total += flight.price * 2; html += `<div class="summary-line"><span>Flight (${flight.name})</span><span>$${flight.price * 2}</span></div>`; }
+  if(hotel) { total += hotel.price * nights; html += `<div class="summary-line"><span>Hotel (${hotel.name}, ${nights} nights)</span><span>$${hotel.price * nights}</span></div>`; }
+  if(car) { total += car.price * days; html += `<div class="summary-line"><span>Car (${car.company} ${car.model}, ${days} days)</span><span>$${car.price * days}</span></div>`; }
+
+  const savings = Math.round(total * 0.15);
+  html += `<div class="summary-line total"><span>Bundle Total</span><span>$${total - savings} <small style="text-decoration:line-through;color:var(--text-light);font-weight:400;">$${total}</small></span></div>`;
+  html += `<div style="color:var(--success);font-size:0.9rem;margin-top:0.5rem;"><i class="fas fa-tag"></i> You save $${savings} with this bundle!</div>`;
+  html += '</div>';
+
+  html += `<div style="margin-top:2rem;text-align:center;"><button class="btn-primary" onclick="openBundleBooking()"><i class="fas fa-lock"></i> Complete Bundle Booking</button></div>`;
+
+  content.innerHTML = html;
+}
+
+function selectBundleItem(type, id) {
+  selectedBundle[type] = selectedBundle[type] === id ? null : id;
+  if(type === 'flight') renderBundleFlights();
+  if(type === 'hotel') renderBundleHotels();
+  if(type === 'car') renderBundleCars();
+}
+
+function openBundleBooking() {
+  selectedFlight = flightData.find(f => f.id === selectedBundle.flight) || flightData[0];
+  openBookingModal();
+}
+
+// ===== POINTS SECTION =====
+function renderPoints() {
+  const grid = document.getElementById('pointsGrid');
+  grid.innerHTML = pointsPrograms.map(p => `
+    <div class="points-card">
+      <div class="points-card-header">
+        <div class="program-icon" style="background:${p.color}"><i class="fas ${p.icon}"></i></div>
+        <div>
+          <h4>${p.name}</h4>
+          <div class="program-tag">Star Alliance Partner</div>
+        </div>
+      </div>
+      <div class="points-card-body">
+        ${p.sweetSpots.map(s => `<div class="sweet-spot"><div class="sweet-spot-label">Sweet Spot</div><div class="sweet-spot-value">${s}</div></div>`).join('')}
+        <div style="font-size:0.8rem;color:var(--text-light);margin-top:0.5rem;">${p.fees}</div>
+        <div class="transfer-partners">
+          ${p.transfers.map(t => `<span class="transfer-tag ${['Amex MR','Chase UR'].includes(t)?'highlight':''}">${t}</span>`).join('')}
+        </div>
+      </div>
+      <div class="points-action">
+        <a href="${p.url}" target="_blank" class="btn-book"><i class="fas fa-external-link-alt"></i> Open Program</a>
+        <button class="btn-outline" onclick="showSection('results')"><i class="fas fa-search"></i> Search Awards</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== GETAWAYS =====
+function renderGetaways() {
+  const grid = document.getElementById('getawaysGrid');
+  grid.innerHTML = getawayData.map(g => `
+    <div class="getaway-card">
+      <div class="getaway-image ${g.image}">
+        <div class="getaway-badge">${g.type}</div>
+        <span style="font-size:3rem;">${g.image === 'romantic' ? '💕' : g.image === 'adventure' ? '🏔️' : g.image === 'luxury' ? '✨' : g.image === 'family' ? '👨‍👩‍👧‍👦' : g.image === 'solo' ? '🎒' : '🌴'}</span>
+      </div>
+      <div class="getaway-content">
+        <h3>${g.name}</h3>
+        <div class="destination"><i class="fas fa-map-marker-alt"></i> ${g.destination} &middot; ${g.duration}</div>
+        <div class="getaway-price-row">
+          <div class="getaway-price">$${g.price} <span class="per">${g.per}</span></div>
+          <div class="getaway-rating">
+            ${Array(5).fill(0).map((_,i) => `<i class="fas fa-star${i < Math.floor(g.rating) ? '' : '-half-alt'}"></i>`).join('')}
+            <span>${g.rating}</span>
+          </div>
+        </div>
+        <div class="getaway-includes">
+          ${g.includes.map(i => `<span class="include-tag">${i}</span>`).join('')}
+        </div>
+        <div class="getaway-cta">
+          <button class="btn-book" onclick="bookGetaway(${g.id})"><i class="fas fa-ticket"></i> Book This Trip</button>
+          <button class="btn-outline" onclick="openChat();sendQuickReply('Tell me more about ${g.name}')">Details</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function sortGetaways(type) {
+  if(type === 'price') getawayData.sort((a,b) => a.price - b.price);
+  if(type === 'rating') getawayData.sort((a,b) => b.rating - a.rating);
+  if(type === 'value') getawayData.sort((a,b) => (b.rating * 100 / b.price) - (a.rating * 100 / a.price));
+  document.querySelectorAll('.getaways-section .sort-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderGetaways();
+}
+
+function bookGetaway(id) {
+  selectedFlight = flightData[0];
+  openBookingModal();
+}
+
+// ===== AGENT WORKFLOW =====
+function renderWorkflow() {
+  const timeline = document.getElementById('workflowTimeline');
+  timeline.innerHTML = agentWorkflow.map((step, idx) => `
+    <div class="workflow-step ${step.status}">
+      <div class="workflow-step-icon" style="background:${step.color}"><i class="fas ${step.icon}"></i></div>
+      <div class="workflow-step-content">
+        <h4>${step.name}</h4>
+        <p>${step.desc}</p>
+      </div>
+      <div class="workflow-step-status ${step.status}">${step.status === 'completed' ? 'Completed' : step.status === 'active' ? 'In Progress' : 'Pending'}</div>
+    </div>
+  `).join('');
+}
+
+function activateAgent(agentId) {
+  document.querySelectorAll('.agent-chip').forEach(c => c.classList.remove('active'));
+  document.getElementById('agent-' + agentId).classList.add('active');
+  openChat();
+  const messages = {
+    discovery: "I'm the Discovery Agent! Tell me your dream destination, budget, and travel dates. I'll find the perfect spots for you.",
+    comparator: "I'm the Comparator Agent! I scan all Star Alliance programs to find the cheapest cash fares AND the best points redemptions.",
+    bundler: "I'm the Bundle Agent! I combine flights, hotels, and cars to maximize your savings. Let's build your perfect package.",
+    booking: "I'm the Booking Agent! I'll handle seat selection, special meals, and all your preferences. Ready to confirm?",
+    payment: "I'm the Payment Agent! I support credit cards, PayPal, and points payments with bank-level security.",
+    support: "I'm the Support Agent! I'm here 24/7 for changes, cancellations, or any travel emergencies."
+  };
+  setTimeout(() => addAgentMessage(messages[agentId]), 300);
+}
+
+// ===== CHAT =====
+function toggleChat() {
+  const panel = document.getElementById('chatPanel');
+  const fab = document.getElementById('chatFab');
+  if(panel.classList.contains('active')) { closeChat(); }
+  else { openChat(); }
+}
+
+function openChat() {
+  document.getElementById('chatPanel').classList.add('active');
+  document.getElementById('chatFab').style.display = 'none';
+}
+
+function closeChat() {
+  document.getElementById('chatPanel').classList.remove('active');
+  document.getElementById('chatFab').style.display = 'flex';
+}
+
+function sendChatMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  addUserMessage(text);
+  input.value = '';
+  processAgentResponse(text);
+}
+
+function sendQuickReply(text) {
+  addUserMessage(text);
+  processAgentResponse(text);
+}
+
+function addUserMessage(text) {
+  const body = document.getElementById('chatBody');
+  body.innerHTML += `<div class="chat-message user"><div class="chat-bubble">${text}</div></div>`;
+  body.scrollTop = body.scrollHeight;
+}
+
+function addAgentMessage(text, quickReplies) {
+  const body = document.getElementById('chatBody');
+  const typing = document.createElement('div');
+  typing.className = 'chat-message agent';
+  typing.innerHTML = '<div class="chat-bubble"><div class="chat-typing"><span></span><span></span><span></span></div></div>';
+  body.appendChild(typing);
+  body.scrollTop = body.scrollHeight;
+
+  setTimeout(() => {
+    typing.remove();
+    let qr = '';
+    if(quickReplies) {
+      qr = '<div class="quick-replies">' + quickReplies.map(r => `<span class="quick-reply" onclick="sendQuickReply('${r}')">${r}</span>`).join('') + '</div>';
+    }
+    body.innerHTML += `<div class="chat-message agent"><div class="chat-bubble">${text}${qr}</div></div>`;
+    body.scrollTop = body.scrollHeight;
+  }, 1200);
+}
+
+function processAgentResponse(text) {
+  const lower = text.toLowerCase();
+  if(lower.includes('rome')) {
+    addAgentMessage("Rome is a fantastic choice! I found some great deals:",
+      ['Show me flights to Rome','Best hotels in Rome','Build a Rome bundle']);
+    setTimeout(() => { document.getElementById('dest').value = 'Rome (FCO)'; }, 500);
+  } else if(lower.includes('barcelona')) {
+    addAgentMessage("Barcelona has amazing deals right now! The Comparator Agent found savings up to 35%.",
+      ['Show flights to Barcelona','Best rated hotels','Cheapest options']);
+    setTimeout(() => { document.getElementById('dest').value = 'Barcelona (BCN)'; }, 500);
+  } else if(lower.includes('flight') || lower.includes('fly')) {
+    addAgentMessage("I'll search for the best flights for you. One moment while the Comparator Agent scans all Star Alliance programs...",
+      ['Search now','Show cheapest','Show best points value']);
+    setTimeout(() => performSearch(), 1500);
+  } else if(lower.includes('hotel')) {
+    addAgentMessage("I can help you find the perfect hotel! What's your budget per night?",
+      ['Under $100/night','$100-200/night','Luxury $200+']);
+  } else if(lower.includes('bundle') || lower.includes('package')) {
+    addAgentMessage("The Bundle Agent is ready! I'll combine your flight, hotel, and car for maximum savings. Let me show you the options.",
+      ['Show bundle options','Build custom bundle']);
+    setTimeout(() => showSection('bundles'), 1000);
+  } else if(lower.includes('point') || lower.includes('mile')) {
+    addAgentMessage("Points optimization is my specialty! Aeroplan and LifeMiles currently have the best sweet spots for your route.",
+      ['Show points comparison','Best transfer partners','Book with points']);
+    setTimeout(() => showSection('points'), 1000);
+  } else if(lower.includes('cheap') || lower.includes('budget')) {
+    addAgentMessage("Looking for budget options! The Comparator Agent found flights starting at $356 with Avianca LifeMiles.",
+      ['Show cheapest flights','Budget getaways','Hostels & budget hotels']);
+  } else if(lower.includes('book') || lower.includes('buy')) {
+    addAgentMessage("The Booking Agent is ready to secure your reservation! I'll need your traveler details and payment method.",
+      ['Start booking','Use points payment','Need more time']);
+  } else if(lower.includes('help') || lower.includes('support')) {
+    addAgentMessage("The Support Agent is here! I can help with changes, cancellations, seat upgrades, or any travel questions.",
+      ['Change my booking','Cancel reservation','Upgrade seat','Contact human agent']);
+  } else {
+    addAgentMessage("I understand! Let me help you with that. Would you like me to search for flights, hotels, or build a complete travel package?",
+      ['Search flights','Find hotels','Build bundle','Talk to human']);
+  }
+}
+
+// ===== BOOKING MODAL =====
+function openBooking(flightId) {
+  selectedFlight = flightData.find(f => f.id === flightId);
+  openBookingModal();
+}
+
+function openBookingModal() {
+  const modal = document.getElementById('bookingModal');
+  modal.classList.add('active');
+  currentBookingStep = 1;
+  updateBookingStep();
+
+  const f = selectedFlight;
+  document.getElementById('bookingFlightSummary').innerHTML = `
+    <div class="summary-line"><span>Route</span><span>${f.from} <i class="fas fa-arrow-right"></i> ${f.to}</span></div>
+    <div class="summary-line"><span>Airline</span><span>${f.name}</span></div>
+    <div class="summary-line"><span>Departure</span><span>${f.dep} on ${document.getElementById('departDate').value}</span></div>
+    <div class="summary-line"><span>Duration</span><span>${f.duration}</span></div>
+    <div class="summary-line"><span>Cabin</span><span>${document.getElementById('cabin').value}</span></div>
+    <div class="summary-line"><span>Travelers</span><span>${document.getElementById('travelers').options[document.getElementById('travelers').selectedIndex].text}</span></div>
+    <div class="summary-line total"><span>Total</span><span>$${f.price * 2}</span></div>
+  `;
+}
+
+function closeBookingModal() {
+  document.getElementById('bookingModal').classList.remove('active');
+  currentBookingStep = 1;
+  updateBookingStep();
+}
+
+function updateBookingStep() {
+  for(let i=1; i<=4; i++) {
+    const dot = document.getElementById('step'+i);
+    const step = document.getElementById('bookingStep'+i);
+    dot.classList.remove('active','completed');
+    step.classList.remove('active');
+    if(i < currentBookingStep) dot.classList.add('completed');
+    if(i === currentBookingStep) { dot.classList.add('active'); step.classList.add('active'); }
+  }
+}
+
+function nextBookingStep(step) {
+  currentBookingStep = step;
+  updateBookingStep();
+  if(step === 3) {
+    const f = selectedFlight;
+    document.getElementById('paymentSummary').innerHTML = `
+      <div class="summary-line"><span>${f.name} Flight</span><span>$${f.price}</span></div>
+      <div class="summary-line"><span>Taxes & Fees</span><span>$${Math.round(f.price*0.15)}</span></div>
+      <div class="summary-line"><span>Traveler: ${document.getElementById('travelerFirstName').value || 'Guest'} ${document.getElementById('travelerLastName').value || ''}</span></div>
+      <div class="summary-line total"><span>Total Due</span><span>$${Math.round(f.price * 1.15)}</span></div>
+    `;
+  }
+}
+
+function prevBookingStep(step) {
+  currentBookingStep = step;
+  updateBookingStep();
+}
+
+function selectPayment(el, method) {
+  document.querySelectorAll('.payment-method').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('cardForm').style.display = method === 'card' ? 'block' : 'none';
+}
+
+function processPayment() {
+  const btn = event.target;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    currentBookingStep = 4;
+    updateBookingStep();
+    const f = selectedFlight;
+    const firstName = document.getElementById('travelerFirstName').value || 'John';
+    const lastName = document.getElementById('travelerLastName').value || 'Doe';
+    const confNum = 'GV' + Math.random().toString(36).substr(2,6).toUpperCase();
+
+    document.getElementById('ticketPreviewContent').innerHTML = `
+      <div class="ticket-row"><span>Passenger</span><span>${firstName} ${lastName}</span></div>
+      <div class="ticket-row"><span>Flight</span><span>${f.name} ${f.code}${100+f.id}</span></div>
+      <div class="ticket-row"><span>Route</span><span>${f.from} <i class="fas fa-arrow-right"></i> ${f.to}</span></div>
+      <div class="ticket-row"><span>Date</span><span>${document.getElementById('departDate').value}</span></div>
+      <div class="ticket-row"><span>Departure</span><span>${f.dep}</span></div>
+      <div class="ticket-row"><span>Confirmation</span><span style="font-weight:700;color:var(--primary);">${confNum}</span></div>
+      <div class="ticket-row"><span>Total Paid</span><span style="font-weight:700;">$${Math.round(f.price * 1.15)}</span></div>
+    `;
+
+    // Update workflow
+    agentWorkflow[3].status = 'completed';
+    agentWorkflow[4].status = 'completed';
+    agentWorkflow[5].status = 'active';
+
+    btn.innerHTML = '<i class="fas fa-check"></i> Pay Securely';
+    btn.disabled = false;
+  }, 2500);
+}
+
+function downloadTicket() {
+  const f = selectedFlight;
+  const firstName = document.getElementById('travelerFirstName').value || 'John';
+  const lastName = document.getElementById('travelerLastName').value || 'Doe';
+  const confNum = 'GV' + Math.random().toString(36).substr(2,6).toUpperCase();
+
+  const ticketText = `
+=====================================
+  Gomaa-ViajeLite E-TICKET
+=====================================
+Confirmation: ${confNum}
+Passenger: ${firstName} ${lastName}
+Flight: ${f.name} ${f.code}${100+f.id}
+Route: ${f.from} -> ${f.to}
+Date: ${document.getElementById('departDate').value}
+Departure: ${f.dep}
+Arrival: ${f.arr}
+Duration: ${f.duration}
+Cabin: ${document.getElementById('cabin').value}
+Total: $${Math.round(f.price * 1.15)}
+=====================================
+Thank you for flying with us!
+`;
+
+  const blob = new Blob([ticketText], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ViajeLite-Ticket-${confNum}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  renderResults();
+  renderRewardsPanel();
+  renderPoints();
+  renderGetaways();
+  renderWorkflow();
+});
+</script>
+</body>
+</html>
