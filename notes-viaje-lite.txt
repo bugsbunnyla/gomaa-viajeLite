@@ -990,3 +990,10 @@ cp .env.example .env.local   # creates their local secrets file
 ```
 
 `.env.example` acts as a **template** — safe to share, tells everyone what variables they need. `.env.local` is the **real thing** — stays private forever.
+
+git init
+git add .
+git commit -m "init"
+git branch -M main
+git remote add origin https://github.com/bugsbunnyla/gomaa-viajeLite.git
+git push -u origin main
