@@ -1,0 +1,11 @@
+{
+  "name": "gomaa-bag2go",
+  "version": "1.0.0",
+  "description": "Cross-platform shipping PWA with multi-stop, split shipment, and delayed delivery",
+  "scripts": {
+    "start": "npx serve . -l 8080",
+    "dev": "npx serve . -l 8080"
+  },
+  "keywords": ["shipping", "pwa", "luggage", "fedex", "ups", "dhl", "amazon"],
+  "license": "MIT"
+}

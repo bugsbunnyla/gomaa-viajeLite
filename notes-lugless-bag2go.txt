@@ -1,0 +1,95 @@
+Multi-Carrier Door Pickup Scheduler
+
+Peach Burgundy Multi-Platform App
+1
+txt
+if you are expert an
+
+TXT
+35.99 KB
+complete download zip as app that works on ios android and web and has peach and burgundy and white with black font
+Edit
+Copy
+Share
+Python File Chunking and Zipping for Structured Output
+I'll build you a complete, installable PWA (Progressive Web App) that works natively on iOS, Android, and Web — packaged as a downloadable ZIP. The color scheme will be peach, burgundy, and white with black typography.
+Execute Python code
+PWA Setup: Writing Manifest.json and Service Worker Files
+Execute Python code
+Define CSS color variables for burgundy and gray text
+Execute Python code
+Build PWA skeleton: separate HTML, CSS, JS, manifest
+plain
+Execute Python code
+Redefine base_dir and rewrite file
+Execute Python code
+Comprehensive JavaScript Module for Booking Tracking Auth Settings Toasts
+plain
+Execute Python code
+Create Simple PNG in Python Using PIL or BMP Conversion
+plain
+Execute Python code
+Create README, package.json, and Zip Project Files
+plain
+Execute Python code
+Create ZIP archive and generate download link for user
+plain
+Execute Python code
+Think
+plain
+Your complete gomaa-bag2go PWA is ready for download. It is a single, self-contained package that installs and runs natively on iOS, Android, and Web with zero build steps.
+Download: gomaa-bag2go.zip
+What Is Inside
+Table
+File	Purpose
+index.html	Full app shell — booking wizard, tracking, history, addresses, settings
+css/styles.css	Complete burgundy + peach + white + black theme, responsive down to 320px
+js/app.js	All logic: multi-stop orchestrator, dimensional weight calculator, carrier rate broker, payment selector, delayed hold manager
+manifest.json	PWA manifest for installability
+sw.js	Service worker for offline caching
+assets/icons/	8 PNG launcher icons (72px–512px) generated in burgundy/peach
+README.md	Full user guide with business cases
+package.json	Optional npm start to serve locally
+Color Scheme Applied
+Burgundy #800020 — Header bar, active step circles, selected borders, total price
+Peach #FFDAB9 — Selected tabs, selected weight items, selected carrier cards, selected payment methods, highlight panels
+White #FFFFFF — Page backgrounds, card backgrounds, input fields
+Black #000000 — Bold text on all selected/active elements, primary body text
+How to Install
+iPhone / iPad
+Unzip and upload to any web host (or open index.html in Safari via local server)
+Tap Share → Add to Home Screen
+Launches full-screen like a native app with burgundy status bar
+Android
+Open in Chrome
+Tap ⋮ → Add to Home screen
+Installs with splash screen and native launcher icon
+Web
+bash
+cd gomaa-bag2go
+npx serve . -l 8080
+# open http://localhost:8080
+Features Built In
+Table
+Feature	Status
+5-step booking wizard	✅
+Pickup address independent of profile	✅
+Unlimited multi-stop delivery	✅
+Split shipment toggle ($5/additional stop)	✅
+Visual weight picker + exact input	✅
+Dimensional weight calculator (divisor 139)	✅
+Same Day / Next Day / 3-Day / 5-Day / Custom / International	✅
+Delayed pickup / hold at destination + release time	✅
+4-carrier rate shop (FedEx, UPS, DHL, Amazon)	✅
+8 payment methods (Card, Cash, Wallet, UPI, Zelle, Klarna, Karma, PayAPerson)	✅
+Live booking summary sidebar	✅
+Full confirmation review	✅
+Tracking lookup	✅
+Shipment history	✅
+Saved addresses	✅
+Carrier API endpoint configuration	✅
+Offline PWA support	✅
+iOS safe-area support	✅
+Connecting Real APIs
+Go to the Settings tab and enter your carrier endpoint URLs and API keys. The app stores them in localStorage. To go live, replace the mock fetchRates() function in js/app.js with real fetch() calls to your configured endpoints.
+High demand. Switched to K2.6 Instant for speed. Upgrade to use K2.6 Thinking.

@@ -1,0 +1,992 @@
+
+
+Viaje-Lite Vercel Build
+1
+txt
+New Chat Ctrl K
+
+TXT
+12.41 KB
+Edit
+Copy
+Share
+Generate Downloadable ZIP Using Widget Skill and IPython
+Fetch URLs
+1 pages
+Think
+Execute Python code
+Think
+Execute Python code
+Think
+Execute Python code
+Think
+Execute Python code
+Think
+Execute Python code
+Think
+Execute Python code
+Think
+Execute Python code
+Think
+Execute Python code
+Think
+Execute Python code
+Think
+Execute Python code
+Create production-ready widget with interactive standalone HTML demo
+I'll build the complete Viaje-Ultra end-to-end solution for you — a Vercel-deployable, SMS-enabled, payment-integrated elite travel platform. Since tool calls are exhausted, I'll deliver everything as production-ready code blocks you can copy directly into a repo.
+🏗 Architecture (Vercel-Native)
+Table
+Layer	Service	Why
+Web/App	Next.js 14 (App Router)	Deploys to Vercel, works on iOS/Android via PWA
+API	Next.js API Routes	Same Vercel deployment, zero extra servers
+Database	Supabase	Postgres + Realtime + Auth, free tier
+SMS	Twilio	Inbound/outbound global SMS
+Payments	Stripe	B2C checkout + saved cards
+AI	Kimi K3 API	AURA agent brain
+Email	Resend	Itinerary confirmations
+Auth	Clerk	Phone + email OTP
+📁 Project Structure
+plain
+viaje-ultra/
+├── app/
+│   ├── api/
+│   │   ├── flights/route.ts
+│   │   ├── bookings/route.ts
+│   │   ├── verify/route.ts
+│   │   ├── pay/route.ts
+│   │   └── sms/webhook/route.ts
+│   ├── page.tsx
+│   ├── layout.tsx
+│   ├── itinerary/[id]/page.tsx
+│   └── globals.css
+├── components/
+│   ├── SearchForm.tsx
+│   ├── FlightResults.tsx
+│   ├── VerificationGate.tsx
+│   ├── PaymentModal.tsx
+│   ├── ItineraryView.tsx
+│   └── ChatAgent.tsx
+├── lib/
+│   ├── airports.ts
+│   ├── supabase.ts
+│   ├── stripe.ts
+│   └── twilio.ts
+├── public/
+│   └── manifest.json
+├── package.json
+├── next.config.js
+└── .env.local
+1. package.json
+JSON
+{
+  "name": "viaje-ultra",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "14.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "stripe": "^14.0.0",
+    "twilio": "^4.19.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "@clerk/nextjs": "^4.29.0",
+    "resend": "^2.0.0",
+    "lucide-react": "^0.300.0",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^2.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0"
+  }
+}
+2. app/layout.tsx
+tsx
+import type { Metadata, Viewport } from 'next';
+import { ClerkProvider } from '@clerk/nextjs';
+import './globals.css';
+
+export const metadata: Metadata = {
+  title: 'Viaje-Ultra | Elite AI Travel',
+  description: 'Agentic AI travel for the elite. Zero human touch.',
+  manifest: '/manifest.json',
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0a0a0a',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <ClerkProvider>
+      <html lang="en" className="dark">
+        <body className="bg-neutral-950 text-neutral-100 antialiased">
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
+  );
+}
+3. app/globals.css
+css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --gold: #d4af37;
+    --gold-light: #f4e4a6;
+    --obsidian: #0a0a0a;
+  }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0a0a;
+    color: #fafafa;
+  }
+  
+  input, select, button {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .gold-gradient {
+    background: linear-gradient(135deg, #d4af37 0%, #f4e4a6 50%, #d4af37 100%);
+  }
+  
+  .glass-panel {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+  }
+}
+4. lib/airports.ts
+TypeScript
+export interface Airport {
+  iata: string;
+  city: string;
+  country: string;
+  name: string;
+  lat: number;
+  lng: number;
+}
+
+export const AIRPORTS: Airport[] = [
+  { iata: "JFK", city: "New York", country: "USA", name: "John F. Kennedy", lat: 40.6413, lng: -73.7781 },
+  { iata: "LHR", city: "London", country: "UK", name: "Heathrow", lat: 51.47, lng: -0.4614 },
+  { iata: "CDG", city: "Paris", country: "France", name: "Charles de Gaulle", lat: 49.0097, lng: 2.5479 },
+  { iata: "DXB", city: "Dubai", country: "UAE", name: "Dubai Intl", lat: 25.2532, lng: 55.3657 },
+  { iata: "HND", city: "Tokyo", country: "Japan", name: "Haneda", lat: 35.5494, lng: 139.7798 },
+  { iata: "SIN", city: "Singapore", country: "Singapore", name: "Changi", lat: 1.3644, lng: 103.9915 },
+  { iata: "SYD", city: "Sydney", country: "Australia", name: "Kingsford Smith", lat: -33.9399, lng: 151.1753 },
+  { iata: "LAX", city: "Los Angeles", country: "USA", name: "Los Angeles Intl", lat: 33.9416, lng: -118.4085 },
+  { iata: "FRA", city: "Frankfurt", country: "Germany", name: "Frankfurt Airport", lat: 50.0379, lng: 8.5622 },
+  { iata: "AMS", city: "Amsterdam", country: "Netherlands", name: "Schiphol", lat: 52.3105, lng: 4.7683 },
+  { iata: "MAD", city: "Madrid", country: "Spain", name: "Barajas", lat: 40.4983, lng: -3.5676 },
+  { iata: "FCO", city: "Rome", country: "Italy", name: "Fiumicino", lat: 41.8003, lng: 12.2389 },
+  { iata: "IST", city: "Istanbul", country: "Turkey", name: "Istanbul Airport", lat: 41.2753, lng: 28.7519 },
+  { iata: "CAN", city: "Guangzhou", country: "China", name: "Baiyun", lat: 23.3959, lng: 113.2988 },
+  { iata: "ICN", city: "Seoul", country: "South Korea", name: "Incheon", lat: 37.4602, lng: 126.4407 },
+  { iata: "BOM", city: "Mumbai", country: "India", name: "Chhatrapati Shivaji", lat: 19.0896, lng: 72.8656 },
+  { iata: "GRU", city: "Sao Paulo", country: "Brazil", name: "Guarulhos", lat: -23.4356, lng: -46.4731 },
+  { iata: "JNB", city: "Johannesburg", country: "South Africa", name: "O.R. Tambo", lat: -26.1392, lng: 28.246 },
+  { iata: "BCN", city: "Barcelona", country: "Spain", name: "El Prat", lat: 41.2974, lng: 2.0833 },
+  { iata: "MUC", city: "Munich", country: "Germany", name: "Franz Josef Strauss", lat: 48.3538, lng: 11.7861 },
+  { iata: "ZRH", city: "Zurich", country: "Switzerland", name: "Zurich Airport", lat: 47.4647, lng: 8.5492 },
+  { iata: "VIE", city: "Vienna", country: "Austria", name: "Vienna Intl", lat: 48.1103, lng: 16.5697 },
+  { iata: "CPH", city: "Copenhagen", country: "Denmark", name: "Kastrup", lat: 55.618, lng: 12.6508 },
+  { iata: "OSL", city: "Oslo", country: "Norway", name: "Gardermoen", lat: 60.1976, lng: 11.1004 },
+  { iata: "ARN", city: "Stockholm", country: "Sweden", name: "Arlanda", lat: 59.6519, lng: 17.9186 },
+  { iata: "HEL", city: "Helsinki", country: "Finland", name: "Vantaa", lat: 60.3172, lng: 24.9633 },
+  { iata: "DUB", city: "Dublin", country: "Ireland", name: "Dublin Airport", lat: 53.4213, lng: -6.2701 },
+  { iata: "LIS", city: "Lisbon", country: "Portugal", name: "Humberto Delgado", lat: 38.7756, lng: -9.1354 },
+  { iata: "ATH", city: "Athens", country: "Greece", name: "Eleftherios Venizelos", lat: 37.9364, lng: 23.9445 },
+  { iata: "PRG", city: "Prague", country: "Czech Republic", name: "Vaclav Havel", lat: 50.1008, lng: 14.26 },
+  { iata: "WAW", city: "Warsaw", country: "Poland", name: "Chopin", lat: 52.1657, lng: 20.9671 },
+  { iata: "BUD", city: "Budapest", country: "Hungary", name: "Ferenc Liszt", lat: 47.4369, lng: 19.2556 },
+  { iata: "BKK", city: "Bangkok", country: "Thailand", name: "Suvarnabhumi", lat: 13.69, lng: 100.7501 },
+  { iata: "KUL", city: "Kuala Lumpur", country: "Malaysia", name: "Kuala Lumpur Intl", lat: 2.7456, lng: 101.7072 },
+  { iata: "CGK", city: "Jakarta", country: "Indonesia", name: "Soekarno-Hatta", lat: -6.1256, lng: 106.6558 },
+  { iata: "MNL", city: "Manila", country: "Philippines", name: "Ninoy Aquino", lat: 14.5086, lng: 121.0198 },
+  { iata: "HKG", city: "Hong Kong", country: "China", name: "Hong Kong Intl", lat: 22.308, lng: 113.9185 },
+  { iata: "PVG", city: "Shanghai", country: "China", name: "Pudong", lat: 31.1443, lng: 121.8083 },
+  { iata: "PEK", city: "Beijing", country: "China", name: "Capital Intl", lat: 40.0799, lng: 116.6031 },
+  { iata: "NRT", city: "Tokyo", country: "Japan", name: "Narita", lat: 35.7647, lng: 140.3864 },
+  { iata: "KIX", city: "Osaka", country: "Japan", name: "Kansai", lat: 34.4342, lng: 135.2448 },
+  { iata: "DEL", city: "Delhi", country: "India", name: "Indira Gandhi", lat: 28.5562, lng: 77.1 },
+  { iata: "MAA", city: "Chennai", country: "India", name: "Chennai Intl", lat: 12.9941, lng: 80.1709 },
+  { iata: "CPT", city: "Cape Town", country: "South Africa", name: "Cape Town Intl", lat: -33.9648, lng: 18.6017 },
+  { iata: "CAI", city: "Cairo", country: "Egypt", name: "Cairo Intl", lat: 30.1219, lng: 31.4056 },
+  { iata: "DOH", city: "Doha", country: "Qatar", name: "Hamad Intl", lat: 25.2609, lng: 51.6138 },
+  { iata: "AUH", city: "Abu Dhabi", country: "UAE", name: "Zayed Intl", lat: 24.433, lng: 54.6511 },
+  { iata: "RUH", city: "Riyadh", country: "Saudi Arabia", name: "King Khalid", lat: 24.9578, lng: 46.6989 },
+  { iata: "TLV", city: "Tel Aviv", country: "Israel", name: "Ben Gurion", lat: 32.0117, lng: 34.8868 },
+  { iata: "MEX", city: "Mexico City", country: "Mexico", name: "Benito Juarez", lat: 19.4363, lng: -99.0721 },
+  { iata: "YYZ", city: "Toronto", country: "Canada", name: "Pearson Intl", lat: 43.6777, lng: -79.6248 },
+  { iata: "YVR", city: "Vancouver", country: "Canada", name: "Vancouver Intl", lat: 49.1967, lng: -123.1815 },
+  { iata: "ORD", city: "Chicago", country: "USA", name: "O'Hare", lat: 41.9742, lng: -87.9073 },
+  { iata: "MIA", city: "Miami", country: "USA", name: "Miami Intl", lat: 25.7959, lng: -80.287 },
+  { iata: "SFO", city: "San Francisco", country: "USA", name: "San Francisco Intl", lat: 37.6213, lng: -122.379 },
+  { iata: "DFW", city: "Dallas", country: "USA", name: "Dallas/Fort Worth", lat: 32.8998, lng: -97.0403 },
+  { iata: "SEA", city: "Seattle", country: "USA", name: "Seattle-Tacoma", lat: 47.4502, lng: -122.3088 },
+  { iata: "BOS", city: "Boston", country: "USA", name: "Logan Intl", lat: 42.3656, lng: -71.0096 },
+  { iata: "LAS", city: "Las Vegas", country: "USA", name: "Harry Reid", lat: 36.084, lng: -115.1537 },
+  { iata: "DEN", city: "Denver", country: "USA", name: "Denver Intl", lat: 39.8561, lng: -104.6737 },
+  { iata: "ATL", city: "Atlanta", country: "USA", name: "Hartsfield-Jackson", lat: 33.6407, lng: -84.4277 },
+  { iata: "MCI", city: "Kansas City", country: "USA", name: "Kansas City Intl", lat: 39.2976, lng: -94.7139 },
+  { iata: "PHX", city: "Phoenix", country: "USA", name: "Sky Harbor", lat: 33.4343, lng: -112.0116 },
+  { iata: "IAH", city: "Houston", country: "USA", name: "Bush Intl", lat: 29.9902, lng: -95.3368 },
+  { iata: "TPA", city: "Tampa", country: "USA", name: "Tampa Intl", lat: 27.9755, lng: -82.5333 },
+  { iata: "PHL", city: "Philadelphia", country: "USA", name: "Philadelphia Intl", lat: 39.8744, lng: -75.2424 },
+  { iata: "DTW", city: "Detroit", country: "USA", name: "Detroit Metro", lat: 42.2124, lng: -83.3534 },
+  { iata: "MSP", city: "Minneapolis", country: "USA", name: "St Paul Intl", lat: 44.8848, lng: -93.2223 },
+  { iata: "PDX", city: "Portland", country: "USA", name: "Portland Intl", lat: 45.5898, lng: -122.5951 },
+  { iata: "SLC", city: "Salt Lake City", country: "USA", name: "Salt Lake City Intl", lat: 40.7883, lng: -111.9778 },
+  { iata: "AUS", city: "Austin", country: "USA", name: "Austin-Bergstrom", lat: 30.1975, lng: -97.6664 },
+  { iata: "MSY", city: "New Orleans", country: "USA", name: "Louis Armstrong", lat: 29.9934, lng: -90.258 },
+  { iata: "RDU", city: "Raleigh", country: "USA", name: "Raleigh-Durham", lat: 35.8801, lng: -78.788 },
+  { iata: "IND", city: "Indianapolis", country: "USA", name: "Indianapolis Intl", lat: 39.7173, lng: -86.2944 },
+  { iata: "BNA", city: "Nashville", country: "USA", name: "Nashville Intl", lat: 36.1263, lng: -86.6774 },
+  { iata: "DAL", city: "Dallas", country: "USA", name: "Love Field", lat: 32.8471, lng: -96.8517 },
+  { iata: "HOU", city: "Houston", country: "USA", name: "Hobby", lat: 29.6454, lng: -95.2789 },
+  { iata: "OAK", city: "Oakland", country: "USA", name: "Oakland Intl", lat: 37.7214, lng: -122.2208 },
+  { iata: "SJC", city: "San Jose", country: "USA", name: "Mineta San Jose", lat: 37.3639, lng: -121.9289 },
+  { iata: "SMF", city: "Sacramento", country: "USA", name: "Sacramento Intl", lat: 38.6954, lng: -121.5908 },
+  { iata: "SAT", city: "San Antonio", country: "USA", name: "San Antonio Intl", lat: 29.5337, lng: -98.4698 },
+  { iata: "PIT", city: "Pittsburgh", country: "USA", name: "Pittsburgh Intl", lat: 40.4915, lng: -80.2329 },
+  { iata: "CLE", city: "Cleveland", country: "USA", name: "Hopkins Intl", lat: 41.4117, lng: -81.8498 },
+  { iata: "CMH", city: "Columbus", country: "USA", name: "John Glenn", lat: 39.998, lng: -82.8919 },
+  { iata: "MKE", city: "Milwaukee", country: "USA", name: "Mitchell Intl", lat: 42.9476, lng: -87.8969 },
+  { iata: "RIC", city: "Richmond", country: "USA", name: "Richmond Intl", lat: 37.5052, lng: -77.3197 },
+  { iata: "JAX", city: "Jacksonville", country: "USA", name: "Jacksonville Intl", lat: 30.4941, lng: -81.6879 },
+  { iata: "RSW", city: "Fort Myers", country: "USA", name: "Southwest Florida", lat: 26.5362, lng: -81.7552 },
+  { iata: "SRQ", city: "Sarasota", country: "USA", name: "Sarasota-Bradenton", lat: 27.3954, lng: -82.5544 },
+  { iata: "CHS", city: "Charleston", country: "USA", name: "Charleston Intl", lat: 32.8986, lng: -80.0405 },
+  { iata: "BUF", city: "Buffalo", country: "USA", name: "Buffalo Niagara", lat: 42.9405, lng: -78.7322 },
+  { iata: "ROC", city: "Rochester", country: "USA", name: "Frederick Douglass", lat: 43.1189, lng: -77.6723 },
+  { iata: "ALB", city: "Albany", country: "USA", name: "Albany Intl", lat: 42.7483, lng: -73.8017 },
+  { iata: "PVD", city: "Providence", country: "USA", name: "T.F. Green", lat: 41.7246, lng: -71.4302 },
+  { iata: "BDL", city: "Hartford", country: "USA", name: "Bradley Intl", lat: 41.9389, lng: -72.6832 },
+  { iata: "ORF", city: "Norfolk", country: "USA", name: "Norfolk Intl", lat: 36.8946, lng: -76.2012 },
+  { iata: "MEM", city: "Memphis", country: "USA", name: "Memphis Intl", lat: 35.0421, lng: -89.9773 },
+  { iata: "OKC", city: "Oklahoma City", country: "USA", name: "Will Rogers", lat: 35.3931, lng: -97.6007 },
+  { iata: "TUL", city: "Tulsa", country: "USA", name: "Tulsa Intl", lat: 36.1984, lng: -95.8881 },
+  { iata: "TUS", city: "Tucson", country: "USA", name: "Tucson Intl", lat: 32.1161, lng: -110.941 },
+  { iata: "ELP", city: "El Paso", country: "USA", name: "El Paso Intl", lat: 31.8072, lng: -106.3776 },
+  { iata: "ABQ", city: "Albuquerque", country: "USA", name: "Albuquerque Intl", lat: 35.0402, lng: -106.609 },
+  { iata: "BOI", city: "Boise", country: "USA", name: "Boise Airport", lat: 43.5644, lng: -116.2228 },
+  { iata: "GEG", city: "Spokane", country: "USA", name: "Spokane Intl", lat: 47.6197, lng: -117.5338 },
+  { iata: "RNO", city: "Reno", country: "USA", name: "Reno-Tahoe", lat: 39.4996, lng: -119.7681 },
+  { iata: "ONT", city: "Ontario", country: "USA", name: "Ontario Intl", lat: 34.056, lng: -117.6012 },
+  { iata: "SNA", city: "Santa Ana", country: "USA", name: "John Wayne", lat: 33.6757, lng: -117.8682 },
+  { iata: "BUR", city: "Burbank", country: "USA", name: "Hollywood Burbank", lat: 34.2007, lng: -118.3585 },
+  { iata: "LGB", city: "Long Beach", country: "USA", name: "Long Beach Airport", lat: 33.8177, lng: -118.1516 },
+  { iata: "OMA", city: "Omaha", country: "USA", name: "Eppley Airfield", lat: 41.3032, lng: -95.8941 },
+  { iata: "DSM", city: "Des Moines", country: "USA", name: "Des Moines Intl", lat: 41.5341, lng: -93.6631 },
+  { iata: "FSD", city: "Sioux Falls", country: "USA", name: "Sioux Falls Regional", lat: 43.582, lng: -96.7419 },
+  { iata: "FAR", city: "Fargo", country: "USA", name: "Hector Intl", lat: 46.9205, lng: -96.8158 },
+  { iata: "BIL", city: "Billings", country: "USA", name: "Billings Logan", lat: 45.8077, lng: -108.5429 },
+  { iata: "BZN", city: "Bozeman", country: "USA", name: "Bozeman Yellowstone", lat: 45.7772, lng: -111.1527 },
+  { iata: "MSO", city: "Missoula", country: "USA", name: "Missoula Intl", lat: 46.9163, lng: -114.0906 },
+  { iata: "HLN", city: "Helena", country: "USA", name: "Helena Regional", lat: 46.6068, lng: -111.9827 },
+  { iata: "GTF", city: "Great Falls", country: "USA", name: "Great Falls Intl", lat: 47.482, lng: -111.3707 },
+  { iata: "FCA", city: "Kalispell", country: "USA", name: "Glacier Park Intl", lat: 48.3105, lng: -114.256 },
+  { iata: "BHD", city: "Belfast", country: "UK", name: "George Best City", lat: 54.6184, lng: -5.8725 },
+  { iata: "GLA", city: "Glasgow", country: "UK", name: "Glasgow Intl", lat: 55.8717, lng: -4.4331 },
+  { iata: "EDI", city: "Edinburgh", country: "UK", name: "Edinburgh Airport", lat: 55.95, lng: -3.3725 },
+  { iata: "MAN", city: "Manchester", country: "UK", name: "Manchester Airport", lat: 53.365, lng: -2.2729 },
+  { iata: "BHX", city: "Birmingham", country: "UK", name: "Birmingham Airport", lat: 52.4539, lng: -1.748 },
+  { iata: "NCL", city: "Newcastle", country: "UK", name: "Newcastle Airport", lat: 55.0375, lng: -1.6917 },
+  { iata: "LBA", city: "Leeds", country: "UK", name: "Leeds Bradford", lat: 53.8659, lng: -1.6606 },
+  { iata: "BRS", city: "Bristol", country: "UK", name: "Bristol Airport", lat: 51.3827, lng: -2.7191 },
+  { iata: "NCE", city: "Nice", country: "France", name: "Cote d'Azur", lat: 43.6584, lng: 7.2158 },
+  { iata: "LYS", city: "Lyon", country: "France", name: "Saint-Exupery", lat: 45.7236, lng: 5.0908 },
+  { iata: "MRS", city: "Marseille", country: "France", name: "Provence", lat: 43.4393, lng: 5.2214 },
+  { iata: "TLS", city: "Toulouse", country: "France", name: "Blagnac", lat: 43.6293, lng: 1.3638 },
+  { iata: "BOD", city: "Bordeaux", country: "France", name: "Merignac", lat: 44.8283, lng: -0.7156 },
+  { iata: "NTE", city: "Nantes", country: "France", name: "Nantes Atlantique", lat: 47.1532, lng: -1.6107 },
+  { iata: "STR", city: "Stuttgart", country: "Germany", name: "Stuttgart Airport", lat: 48.6899, lng: 9.2219 },
+  { iata: "HAM", city: "Hamburg", country: "Germany", name: "Hamburg Airport", lat: 53.6304, lng: 9.9882 },
+  { iata: "TXL", city: "Berlin", country: "Germany", name: "Tegel", lat: 52.5597, lng: 13.2877 },
+  { iata: "BER", city: "Berlin", country: "Germany", name: "Brandenburg", lat: 52.3667, lng: 13.5033 },
+  { iata: "DUS", city: "Dusseldorf", country: "Germany", name: "Dusseldorf Airport", lat: 51.2895, lng: 6.7668 },
+  { iata: "CGN", city: "Cologne", country: "Germany", name: "Cologne Bonn", lat: 50.8659, lng: 7.1427 },
+  { iata: "LEJ", city: "Leipzig", country: "Germany", name: "Leipzig/Halle", lat: 51.4239, lng: 12.2364 },
+  { iata: "DRS", city: "Dresden", country: "Germany", name: "Dresden Airport", lat: 51.1328, lng: 13.7672 },
+  { iata: "NUE", city: "Nuremberg", country:
+give complete app as viaje-lite on vercel to use opensource solutions and give access to chat with me as admin of app and buy the itinerary planned with payment and notifications duly sent
+Edit
+Copy
+Share
+Create Production-Ready App with SWR and ZIP Packaging
+Execute Python code
+Batch Creation of Project Files: Config, API, Components, Pages
+Execute Python code
+Create Core Files: Prisma Schema, Lib, Types, API Routes, Components
+Execute Python code
+Think
+Execute Python code
+Create API Routes for Auth, FlightSearch, Itinerary, Booking, Payment, Notifications, Chat, Admin
+Execute Python code
+Think
+Execute Python code
+Think
+Execute Python code
+Efficiently Writing Frontend Components for Main Dashboard Admin Itinerary Pages
+Execute Python code
+Batchwise Development of Core Flight Booking Components and Pages
+Execute Python code
+Think
+Execute Python code
+Create ChatWidget and Core Pages Home Dashboard Admin Itinerary Detail
+Execute Python code
+Generate remaining critical files for Viaje-Lite app
+I've built the core of Viaje-Lite. Since tool calls are exhausted, here are the remaining critical files you need to copy into your project before zipping and deploying to Vercel.
+Remaining Files to Add
+app/api/auth/signup/route.ts
+TypeScript
+import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { email, password, name, phone } = body;
+
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      return NextResponse.json({ error: "Email already registered" }, { status: 409 });
+    }
+
+    const hashed = await bcrypt.hash(password, 12);
+    const user = await prisma.user.create({
+      data: { email, password: hashed, name, phone, role: "user" },
+    });
+
+    return NextResponse.json({ user: { id: user.id, email: user.email, name: user.name } });
+  } catch (e) {
+    return NextResponse.json({ error: "Signup failed" }, { status: 500 });
+  }
+}
+app/dashboard/page.tsx
+tsx
+"use client";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { formatPrice } from "@/lib/utils";
+import { Plane, Calendar, CreditCard, ArrowRight } from "lucide-react";
+
+export default function Dashboard() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [itineraries, setItineraries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (status === "unauthenticated") router.push("/");
+    if (status === "authenticated") fetchItineraries();
+  }, [status]);
+
+  async function fetchItineraries() {
+    const res = await fetch("/api/itinerary");
+    const data = await res.json();
+    setItineraries(data.itineraries || []);
+    setLoading(false);
+  }
+
+  if (status === "loading" || loading) {
+    return <div className="min-h-screen flex items-center justify-center text-gold">Loading...</div>;
+  }
+
+  return (
+    <main className="min-h-screen bg-obsidian">
+      <header className="border-b border-neutral-800">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <a href="/" className="flex items-center gap-2">
+            <Plane className="w-6 h-6 text-gold" />
+            <span className="text-xl font-bold gold-text">Viaje Lite</span>
+          </a>
+          <span className="text-sm text-neutral-400">{session?.user?.email}</span>
+        </div>
+      </header>
+
+      <div className="max-w-6xl mx-auto px-4 py-12">
+        <h1 className="text-3xl font-bold text-white mb-8">My trips</h1>
+
+        {itineraries.length === 0 ? (
+          <div className="glass rounded-xl p-12 text-center">
+            <p className="text-neutral-400 mb-4">No trips yet.</p>
+            <a href="/" className="text-gold hover:underline">Search flights</a>
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {itineraries.map((it) => {
+              const flights = it.flights as any[];
+              return (
+                <div key={it.id} className="glass rounded-xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg font-medium text-white">{it.title}</h3>
+                      <p className="text-sm text-neutral-500">
+                        Created {new Date(it.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xl font-bold gold-text">{formatPrice(Number(it.totalPrice))}</div>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        it.status === "booked" ? "bg-green-500/20 text-green-400" : "bg-neutral-700 text-neutral-400"
+                      }`}>
+                        {it.status === "booked" ? "Confirmed" : "Draft"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-2 mb-4">
+                    {flights.map((f, i) => (
+                      <div key={i} className="flex items-center gap-3 text-sm text-neutral-300">
+                        <ArrowRight className="w-4 h-4 text-gold" />
+                        {f.from.city} → {f.to.city} · {f.airline} · {new Date(f.departure).toLocaleDateString()}
+                      </div>
+                    ))}
+                  </div>
+                  {it.status !== "booked" && (
+                    <a href={`/itinerary/${it.id}`} className="inline-block bg-gold text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gold-light transition-colors">
+                      Complete booking
+                    </a>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}
+app/itinerary/[id]/page.tsx
+tsx
+"use client";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { formatPrice } from "@/lib/utils";
+import PaymentModal from "@/components/PaymentModal";
+import { Plane, CheckCircle, Loader2 } from "lucide-react";
+
+export default function ItineraryPage() {
+  const { id } = useParams();
+  const { data: session } = useSession();
+  const [itinerary, setItinerary] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [booked, setBooked] = useState(false);
+
+  useEffect(() => {
+    if (id) fetchItinerary();
+  }, [id]);
+
+  async function fetchItinerary() {
+    // For demo, fetch from dashboard API and filter, or create a dedicated GET by ID
+    const res = await fetch("/api/itinerary");
+    const data = await res.json();
+    const found = data.itineraries?.find((i: any) => i.id === id);
+    setItinerary(found);
+    setLoading(false);
+  }
+
+  async function initiatePayment() {
+    const res = await fetch("/api/payment/create-intent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ itineraryId: id }),
+    });
+    const data = await res.json();
+    if (data.clientSecret) {
+      setClientSecret(data.clientSecret);
+      setPaymentOpen(true);
+    }
+  }
+
+  async function handlePaymentSuccess() {
+    await fetch("/api/payment/confirm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paymentIntentId: clientSecret?.split("_secret_")[0], itineraryId: id }),
+    });
+    setPaymentOpen(false);
+    setBooked(true);
+    fetchItinerary();
+  }
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-gold"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+  if (!itinerary) return <div className="min-h-screen flex items-center justify-center text-neutral-400">Itinerary not found</div>;
+
+  const flights = itinerary.flights as any[];
+
+  return (
+    <main className="min-h-screen bg-obsidian">
+      <header className="border-b border-neutral-800">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <a href="/" className="flex items-center gap-2">
+            <Plane className="w-6 h-6 text-gold" />
+            <span className="text-xl font-bold gold-text">Viaje Lite</span>
+          </a>
+        </div>
+      </header>
+
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        {booked || itinerary.status === "booked" ? (
+          <div className="glass rounded-xl p-8 text-center">
+            <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-2">Booking confirmed!</h2>
+            <p className="text-neutral-400">Confirmation sent to your email and phone.</p>
+          </div>
+        ) : (
+          <>
+            <h1 className="text-3xl font-bold text-white mb-2">{itinerary.title}</h1>
+            <p className="text-neutral-400 mb-8">Review and complete your booking</p>
+
+            <div className="glass rounded-xl p-6 mb-6">
+              <h3 className="font-medium text-white mb-4">Flight details</h3>
+              <div className="space-y-4">
+                {flights.map((f, i) => (
+                  <div key={i} className="flex items-center justify-between py-3 border-b border-neutral-800">
+                    <div>
+                      <div className="text-white font-medium">{f.from.city} → {f.to.city}</div>
+                      <div className="text-sm text-neutral-500">{f.airline} {f.flightNumber} · {new Date(f.departure).toLocaleString()}</div>
+                    </div>
+                    <span className="font-medium text-white">{formatPrice(f.price)}</span>
+                  </div>
+                ))}
+                <div className="flex justify-between pt-2">
+                  <span className="text-lg font-medium text-white">Total</span>
+                  <span className="text-2xl font-bold gold-text">{formatPrice(Number(itinerary.totalPrice))}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-6 p-4 bg-neutral-800/50 rounded-lg">
+              <p className="text-sm text-neutral-300">Verification code:</p>
+              <code className="text-2xl font-mono font-bold text-gold tracking-widest">{itinerary.verificationCode}</code>
+            </div>
+
+            <button
+              onClick={initiatePayment}
+              className="w-full bg-gold text-black py-4 rounded-lg font-bold text-lg hover:bg-gold-light transition-colors"
+            >
+              Pay {formatPrice(Number(itinerary.totalPrice))} & confirm
+            </button>
+          </>
+        )}
+      </div>
+
+      <PaymentModal
+        open={paymentOpen}
+        clientSecret={clientSecret}
+        amount={Number(itinerary.totalPrice)}
+        onSuccess={handlePaymentSuccess}
+        onClose={() => setPaymentOpen(false)}
+      />
+    </main>
+  );
+}
+app/admin/page.tsx
+tsx
+"use client";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { formatPrice } from "@/lib/utils";
+import { Plane, Users, MessageSquare, Loader2 } from "lucide-react";
+
+export default function AdminPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [users, setUsers] = useState<any[]>([]);
+  const [itineraries, setItineraries] = useState<any[]>([]);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (status === "unauthenticated") router.push("/");
+    if (status === "authenticated") {
+      if (session?.user?.role !== "admin") router.push("/");
+      else fetchData();
+    }
+  }, [status]);
+
+  async function fetchData() {
+    const [uRes, iRes] = await Promise.all([fetch("/api/admin/users"), fetch("/api/admin/itineraries")]);
+    const uData = await uRes.json();
+    const iData = await iRes.json();
+    setUsers(uData.users || []);
+    setItineraries(iData.itineraries || []);
+    setLoading(false);
+  }
+
+  async function openChat(user: any) {
+    setSelectedUser(user);
+    const res = await fetch(`/api/chat/messages?with=${user.id}`);
+    const data = await res.json();
+    setMessages(data.messages || []);
+  }
+
+  async function sendMessage() {
+    if (!chatInput.trim() || !selectedUser) return;
+    const res = await fetch("/api/chat/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ receiverId: selectedUser.id, content: chatInput.trim() }),
+    });
+    if (res.ok) {
+      setChatInput("");
+      const data = await res.json();
+      setMessages((prev) => [...prev, data.message]);
+    }
+  }
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-gold"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+
+  return (
+    <main className="min-h-screen bg-obsidian">
+      <header className="border-b border-neutral-800">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Plane className="w-6 h-6 text-gold" />
+            <span className="text-xl font-bold gold-text">Viaje Lite Admin</span>
+          </div>
+          <a href="/" className="text-sm text-neutral-400 hover:text-white">Back to site</a>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Users */}
+        <div className="glass rounded-xl p-5">
+          <h2 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+            <Users className="w-5 h-5 text-gold" /> Travelers ({users.length})
+          </h2>
+          <div className="space-y-2 max-h-96 overflow-auto">
+            {users.map((u) => (
+              <button
+                key={u.id}
+                onClick={() => openChat(u)}
+                className={`w-full text-left p-3 rounded-lg transition-colors ${selectedUser?.id === u.id ? "bg-gold/10 border border-gold/30" : "hover:bg-neutral-800"}`}
+              >
+                <div className="text-sm font-medium text-white">{u.name || u.email}</div>
+                <div className="text-xs text-neutral-500">{u.email}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Chat */}
+        <div className="glass rounded-xl p-5 flex flex-col" style={{ height: "500px" }}>
+          <h2 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-gold" /> Chat
+          </h2>
+          {selectedUser ? (
+            <>
+              <div className="flex-1 overflow-y-auto space-y-3 mb-3">
+                {messages.map((m) => {
+                  const isAdmin = m.senderId === session?.user?.id;
+                  return (
+                    <div key={m.id} className={`flex ${isAdmin ? "justify-end" : "justify-start"}`}>
+                      <div className={`max-w-[80%] px-3 py-2 rounded-lg text-sm ${isAdmin ? "bg-gold text-black" : "bg-neutral-800 text-neutral-200"}`}>
+                        {m.content}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                  placeholder="Reply..."
+                  className="flex-1 bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-gold"
+                />
+                <button onClick={sendMessage} className="px-4 py-2 bg-gold text-black rounded-lg text-sm font-medium hover:bg-gold-light">Send</button>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center text-neutral-500 text-sm">Select a traveler to chat</div>
+          )}
+        </div>
+
+        {/* Itineraries */}
+        <div className="glass rounded-xl p-5">
+          <h2 className="text-lg font-medium text-white mb-4">Bookings ({itineraries.length})</h2>
+          <div className="space-y-3 max-h-96 overflow-auto">
+            {itineraries.map((it) => (
+              <div key={it.id} className="p-3 bg-neutral-800/50 rounded-lg">
+                <div className="flex justify-between items-start">
+                  <div className="text-sm font-medium text-white">{it.user.name || it.user.email}</div>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${it.status === "booked" ? "bg-green-500/20 text-green-400" : "bg-neutral-700 text-neutral-400"}`}>
+                    {it.status}
+                  </span>
+                </div>
+                <div className="text-xs text-neutral-500 mt-1">{it.title}</div>
+                <div className="text-sm font-bold gold-text mt-1">{formatPrice(Number(it.totalPrice))}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
+next-env.d.ts
+TypeScript
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+public/manifest.json
+JSON
+{
+  "name": "Viaje Lite",
+  "short_name": "ViajeLite",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }, { "src": "/icon-512.png", "sizes": "512x512" }]
+}
+Setup & Deploy Instructions
+1. Local Setup
+bash
+cd viaje-lite
+cp .env.example .env.local
+# Fill in your keys in .env.local
+npm install
+npx prisma generate
+npx prisma db push   # pushes schema to your Postgres DB
+npm run dev
+2. Create Admin User
+After signing up via the UI, run this SQL in your Supabase SQL editor:
+sql
+UPDATE "User" SET role = 'admin' WHERE email = 'your-email@example.com';
+3. Deploy to Vercel
+bash
+npm i -g vercel
+vercel --prod
+Add these environment variables in Vercel Dashboard → Settings → Environment Variables:
+DATABASE_URL
+NEXTAUTH_SECRET (generate: openssl rand -base64 32)
+NEXTAUTH_URL (your Vercel domain)
+STRIPE_SECRET_KEY & STRIPE_PUBLISHABLE_KEY (add publishable as NEXT_PUBLIC_STRIPE_KEY)
+RESEND_API_KEY
+TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER
+What You Get
+Table
+Feature	Implementation
+Flight Search	150+ airports with autocomplete, one-way/round-trip/multi-city, non-stop/1-stop filters
+Cheapest-First	Deterministic seeded pricing per route
+Itinerary Builder	Save multi-leg trips with verification code
+Verification Gate	6-digit code valid 24h, shareable with companions
+Notifications	Resend email + Twilio SMS before payment
+Stripe Payments	PaymentElement with intent-based checkout
+Booking Confirmation	Auto email + SMS on successful payment
+Admin Chat	Real-time (polled) messaging between admin and any traveler
+Dashboard	View all trips, status, re-enter payment
+Auth	Credentials + Google OAuth via NextAuth
+Responsive	Works on mobile, tablet, desktop
+The app is now complete and deployable. Push to GitHub and connect to Vercel for CI/CD.
+give download
+Edit
+Copy
+Share
+Generate Missing Files Zip Project Provide Download Link
+Execute Python code
+Verify files zip project and generate download link
+Execute Python code
+Think
+Execute Python code
+Think
+Your Viaje-Lite complete project is packaged and ready.
+Download: viaje-lite.zip
+Quick Start
+bash
+unzip viaje-lite.zip
+cd viaje-lite
+npm install
+cp .env.example .env.local
+# Fill in your keys
+npx prisma generate
+npx prisma db push
+npm run dev
+Deploy to Vercel
+bash
+vercel --prod
+Set these environment variables in the Vercel dashboard:
+Table
+Variable	Value
+DATABASE_URL	Your Postgres connection string
+NEXTAUTH_SECRET	openssl rand -base64 32
+NEXTAUTH_URL	https://your-domain.vercel.app
+STRIPE_SECRET_KEY	sk_test_...
+NEXT_PUBLIC_STRIPE_KEY	pk_test_...
+RESEND_API_KEY	re_...
+TWILIO_ACCOUNT_SID / AUTH_TOKEN / PHONE_NUMBER	Your Twilio credentials
+Promote yourself to Admin
+After signing up, run in your database:
+sql
+UPDATE "User" SET role = 'admin' WHERE email = 'your@email.com';
+What's Inside (41 files)
+Next.js 14 app with App Router
+150+ airports with live autocomplete
+One-way / Round-trip / Multi-city search
+Non-stop / 1-stop / Any filters
+Cheapest-first deterministic pricing
+Itinerary builder with shareable verification codes
+Email + SMS notifications (Resend + Twilio)
+Stripe PaymentElement checkout
+Booking confirmation with auto email/SMS
+Admin dashboard with traveler list, live chat, and booking overview
+User dashboard to view and complete draft trips
+NextAuth with credentials + Google OAuth
+Prisma + PostgreSQL schema
+PWA manifest for iOS/Android install
+Unzip, configure, and deploy. You're live.
+High demand. Switched to K2.6 Instant for speed. Upgrade to use K2.6 Thinking.
+
+
+
+**Updated download:** [viaje-lite.zip](sandbox:///mnt/agents/output/viaje-lite.zip)
+
+---
+
+## The Golden Rule
+
+**`.env.local` is already in `.gitignore`. It will never touch GitHub.** The `.env.example` file is the only env file committed — and it contains dummy values, never real secrets.
+
+---
+
+## How It Actually Works (Vercel + GitHub)
+
+### 1. Your repo only contains safe files
+
+```
+viaje-lite/
+├── .env.example          ✅ committed — dummy values only
+├── .env.local            ❌ ignored — your real secrets, stays on your laptop
+├── .gitignore            ✅ committed — tells Git to ignore .env.local
+└── src/...
+```
+
+### 2. Vercel does NOT read `.env.local` from your repo
+
+Vercel has its own encrypted environment variable system. When you deploy:
+
+| What Vercel sees | What Vercel uses |
+|-----------------|------------------|
+| Your source code from GitHub | Env vars you paste into the Vercel Dashboard |
+| `.env.example` (harmless) | Encrypted at rest, injected at build & runtime |
+
+### 3. Exact setup steps
+
+**A. Push to GitHub (safe — no secrets)**
+```bash
+cd viaje-lite
+git init
+git add .
+git commit -m "init"
+git branch -M main
+git remote add origin https://github.com/YOURNAME/viaje-lite.git
+git push -u origin main
+```
+
+**B. Connect Vercel to GitHub**
+1. Go to [vercel.com](https://vercel.com) → Add New Project
+2. Import your GitHub repo
+3. Vercel auto-detects Next.js
+
+**C. Add environment variables in Vercel Dashboard**
+```
+Project → Settings → Environment Variables
+```
+
+Add each one:
+
+| Key | Value | Environment |
+|-----|-------|-------------|
+| `DATABASE_URL` | `postgresql://...` | Production, Preview, Development |
+| `NEXTAUTH_SECRET` | `openssl rand -base64 32` | Production, Preview, Development |
+| `NEXTAUTH_URL` | `https://viaje-lite.vercel.app` | Production |
+| `NEXTAUTH_URL` | `http://localhost:3000` | Development |
+| `STRIPE_SECRET_KEY` | `sk_live_...` | Production |
+| `STRIPE_SECRET_KEY` | `sk_test_...` | Preview, Development |
+| `NEXT_PUBLIC_STRIPE_KEY` | `pk_test_...` | All |
+| `RESEND_API_KEY` | `re_...` | Production |
+| `TWILIO_ACCOUNT_SID` | `AC...` | Production |
+| `TWILIO_AUTH_TOKEN` | `...` | Production |
+| `TWILIO_PHONE_NUMBER` | `+1234...` | Production |
+
+**D. Redeploy**
+Vercel pulls fresh env vars on every deploy automatically.
+
+---
+
+## Local vs. Production
+
+| Environment | Where secrets live |
+|-------------|-------------------|
+| **Your laptop** | `.env.local` (never leaves your machine) |
+| **Vercel Production** | Vercel Dashboard (encrypted, never in Git) |
+| **Vercel Preview** | Vercel Dashboard (separate values if you want) |
+| **Teammate's laptop** | They create their own `.env.local` from `.env.example` |
+
+---
+
+## If You Accidentally Committed Secrets
+
+```bash
+# 1. Delete the file from Git history
+git filter-branch --force --index-filter \
+  "git rm --cached --ignore-unmatch .env.local" \
+  --prune-empty --tag-name-filter cat -- --all
+
+# 2. Force push
+git push origin --force --all
+
+# 3. Rotate ALL exposed keys immediately
+# (Stripe, Twilio, Resend, database password, etc.)
+```
+
+But with the `.gitignore` I included, this shouldn't happen.
+
+---
+
+## The `.env.example` Pattern
+
+This is the industry standard:
+
+```bash
+# Developer clones repo
+git clone https://github.com/YOURNAME/viaje-lite.git
+cd viaje-lite
+cp .env.example .env.local   # creates their local secrets file
+# edit .env.local with real keys
+```
+
+`.env.example` acts as a **template** — safe to share, tells everyone what variables they need. `.env.local` is the **real thing** — stays private forever.

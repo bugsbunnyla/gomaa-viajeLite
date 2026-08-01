@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+
+# Env files (NEVER commit secrets)
+.env
+.env.local
+.env.*.local
+
+# Misc
+*.log
+.DS_Store
+.vscode/
+.idea/
+
+# Prisma
+prisma/migrations/
+
+# Vercel
+.vercel
